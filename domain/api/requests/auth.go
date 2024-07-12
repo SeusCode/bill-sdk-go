@@ -10,7 +10,7 @@ type (
 		ComercialName string `json:"nombreComercial,omitempty"`
 
 		IIBB            string            `json:"ingresosBrutos,omitempty"`
-		TaxId           string            `json:"cuit"`
+		TaxId           int               `json:"cuit"`
 		FiscalType      fiscal.FiscalType `json:"iva"`
 		FiscalAddress   string            `json:"domicilio"`
 		StartOfActivity string            `json:"inicioActividad"`

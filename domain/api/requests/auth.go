@@ -7,9 +7,9 @@ type (
 		Pos int `json:"puntoVenta"`
 
 		BusinessName  string `json:"razonSocial"`
-		ComercialName string `json:"nombreComercial,omitempty"`
+		ComercialName string `json:"nombreComercial"`
 
-		IIBB            string            `json:"ingresosBrutos,omitempty"`
+		IIBB            string            `json:"ingresosBrutos"`
 		TaxId           int               `json:"cuit"`
 		FiscalType      fiscal.FiscalType `json:"iva"`
 		FiscalAddress   string            `json:"domicilio"`

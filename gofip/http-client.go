@@ -59,7 +59,9 @@ func newHttpClient(data *Gofip) *httpClient {
 	}
 
 	// Adding default headers
-	defaultHeaders := map[string]string{}
+	defaultHeaders := map[string]string{
+		"Content-Type": "application/json",
+	}
 
 	if data.authToken != "" {
 		defaultHeaders["Authorization"] = "Bearer " + data.authToken
@@ -125,8 +127,6 @@ func (c *httpClient) Post(endpoint string, data interface{}, expectedResponse in
 	if err != nil {
 		return nil, err
 	}
-
-	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := c.http.Do(req)
 	if err != nil {

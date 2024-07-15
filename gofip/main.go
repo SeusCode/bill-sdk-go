@@ -9,7 +9,6 @@ import (
 	"github.com/seuscode/afip-sdk-go/domain/api/responses"
 	"github.com/seuscode/afip-sdk-go/domain/fiscal"
 	"github.com/seuscode/afip-sdk-go/endpoints"
-	"github.com/seuscode/afip-sdk-go/pkg/billing"
 )
 
 type Gofip struct {
@@ -23,28 +22,28 @@ type Gofip struct {
 	privateKey []byte
 
 	// taxpayer gross income
-	iibb *string
+	IIBB *string
 
 	// taxpayer single tax identification (CUIT)
-	taxId int
+	TaxId int
 
 	// businessName / Name & surname of the taxpayer
-	businessName string
+	BusinessName string
 
 	//  Comercial name to be used on invoices instead of businessName
-	comercialName *string
+	ComercialName *string
 
 	// Address registered inside afip
-	fiscalAddress string
+	FiscalAddress string
 
 	// fiscal type of the taxpayer
-	fiscalType fiscal.FiscalType
+	FiscalType fiscal.FiscalType
 
 	// Taxpayer activity start date
-	startOfActivity string
+	StartOfActivity string
 
 	// Point of sale that will be used on invoices
-	pointOfSale int
+	PointOfSale int
 
 	// Api enviroment to make the requests
 	enviroment Enviroment
@@ -53,9 +52,7 @@ type Gofip struct {
 	authToken string
 
 	// Http client to make the requests
-	httpClient *httpClient
-
-	ElectronicBilling *billing.ElectronicBilling
+	HttpClient *httpClient
 }
 
 func NewGofip(opts GofipOptions) (*Gofip, error) {
@@ -68,22 +65,19 @@ func NewGofip(opts GofipOptions) (*Gofip, error) {
 		certificate: opts.Certificate,
 		privateKey:  opts.PrivateKey,
 
-		taxId:           opts.TaxId,
-		iibb:            opts.IIBB,
-		businessName:    opts.BusinessName,
-		comercialName:   opts.ComercialName,
-		fiscalAddress:   opts.FiscalAddress,
-		fiscalType:      opts.FiscalType,
-		startOfActivity: opts.StartOfActivity,
-		pointOfSale:     opts.PointOfSale,
+		TaxId:           opts.TaxId,
+		IIBB:            opts.IIBB,
+		BusinessName:    opts.BusinessName,
+		ComercialName:   opts.ComercialName,
+		FiscalAddress:   opts.FiscalAddress,
+		FiscalType:      opts.FiscalType,
+		StartOfActivity: opts.StartOfActivity,
+		PointOfSale:     opts.PointOfSale,
 
 		enviroment: opts.Enviroment,
 	}
 
-	gofip.httpClient = newHttpClient(gofip)
-	if err := gofip.GetAuthToken(); err != nil {
-		fmt.Println("[WARNING] (LOGIN): Cannot obtain a jwt")
-	}
+	gofip.HttpClient = newHttpClient(gofip)
 
 	return gofip, nil
 }
@@ -92,23 +86,27 @@ func (g *Gofip) GetAuthToken() error {
 	tempHttpClient := newHttpClient(g)
 
 	r := requests.AuthRequest{
-		Pos:          g.pointOfSale,
-		TaxId:        g.taxId,
-		BusinessName: g.businessName,
+		Pos:          g.PointOfSale,
+		TaxId:        g.TaxId,
+		BusinessName: g.BusinessName,
 
-		FiscalType:      g.fiscalType,
-		FiscalAddress:   g.fiscalAddress,
-		StartOfActivity: g.startOfActivity,
+		FiscalType:      g.FiscalType,
+		FiscalAddress:   g.FiscalAddress,
+		StartOfActivity: g.StartOfActivity,
 
 		Enviroment: int(g.enviroment),
 	}
 
-	if g.comercialName != nil {
-		r.ComercialName = *g.comercialName
+	if g.ComercialName != nil {
+		r.ComercialName = *g.ComercialName
+	} else {
+		r.ComercialName = ""
 	}
 
-	if g.iibb != nil {
-		r.IIBB = *g.iibb
+	if g.IIBB != nil {
+		r.IIBB = *g.IIBB
+	} else {
+		r.IIBB = fmt.Sprintf("%d", g.TaxId)
 	}
 
 	r.Certificate = base64.StdEncoding.EncodeToString(g.certificate)
@@ -125,8 +123,9 @@ func (g *Gofip) GetAuthToken() error {
 	}
 
 	g.authToken = authResponse.JWT
-	g.httpClient = newHttpClient(g)
+	g.HttpClient = newHttpClient(g)
 
+	fmt.Println("[SUCCESS] (Login): Access approved by afip wsaa")
 	return nil
 }
 

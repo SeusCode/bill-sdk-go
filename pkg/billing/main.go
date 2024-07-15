@@ -1,6 +1,16 @@
 package billing
 
-import "github.com/seuscode/afip-sdk-go/domain/voucher"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/seuscode/afip-sdk-go/domain/api/requests"
+	"github.com/seuscode/afip-sdk-go/domain/api/responses"
+	"github.com/seuscode/afip-sdk-go/domain/document"
+	"github.com/seuscode/afip-sdk-go/domain/voucher"
+	"github.com/seuscode/afip-sdk-go/endpoints"
+	"github.com/seuscode/afip-sdk-go/gofip"
+)
 
 type ElectronicBilling interface {
 	/**
@@ -23,15 +33,12 @@ type ElectronicBilling interface {
 	 	examples/createVoucher.js Example with all allowed
 	 	 attributes}
 
-	 @params bool returnResponse if is TRUE returns complete response
-	 	from AFIP
-
-	 @return array if returnResponse is set to false returns
+	 @return array
 	 	[CAE : CAE assigned to voucher, CAEFchVto : Expiration date
 	 	for CAE (yyyy-mm-dd)] else returns complete response from
 	 	AFIP {@see WS Specification item 4.1.3}
 	**/
-	CreateVoucher(data *voucher.Voucher, returnRes bool) error
+	CreateVoucher(data *voucher.Voucher, response *responses.CreateInvoiceResponse) error
 
 	/**
 	 * Create next voucher from AFIP
@@ -111,7 +118,7 @@ type ElectronicBilling interface {
 	 *
 	 * @return array All aliquot availables
 	 **/
-	GetAliquotTypes() (interface{}, error)
+	GetAliquotTypes() (*responses.GetAliquotTypesResponse, error)
 
 	/**
 	 * Asks to AFIP Servers for currencies availables {@see WS
@@ -149,13 +156,16 @@ type ElectronicBilling interface {
 }
 
 type eBilling struct {
+	afip *gofip.Gofip
 }
 
-type Options struct {
+type BillingOptions struct {
 }
 
-func NewElectronicBilling(config interface{}, opts Options) ElectronicBilling {
-	return &eBilling{}
+func NewElectronicBilling(afip *gofip.Gofip, opts BillingOptions) ElectronicBilling {
+	return &eBilling{
+		afip: afip,
+	}
 }
 
 /*
@@ -164,7 +174,98 @@ func NewElectronicBilling(config interface{}, opts Options) ElectronicBilling {
 	-=============================-
 */
 
-func (e *eBilling) CreateVoucher(data *voucher.Voucher, returnRes bool) error {
+func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *responses.CreateInvoiceResponse) error {
+	r := requests.CreateVoucher{
+		PtoVta: e.afip.PointOfSale,
+
+		CbteTipo: data.CbteTipo,
+		Concepto: data.Concepto,
+
+		DocTipo: data.DocTipo,
+		DocNro:  data.DocNro,
+
+		CbteFch: data.CbteFch,
+		Items:   data.Items,
+
+		CbtesAsoc:   data.CbtesAsoc,
+		Iva:         data.Iva,
+		Tributos:    data.Tributos,
+		Opcionales:  data.Opcionales,
+		Compradores: data.Compradores,
+
+		CompradorIvaExento: data.CompradorIvaExento,
+		PagoContado:        data.PagoContado,
+		GeneratePDF:        data.GeneratePDF,
+
+		MonId:    data.MonId,
+		MonCotiz: data.MonCotiz,
+	}
+
+	/*
+		This fields are only required for vouchers
+		wich concepts are not only products, validate
+		that cases
+	*/
+	if r.Concepto != voucher.Productos {
+		if data.FchServDesde == nil {
+			return errors.New("missing required field for this voucher: FchServDesde")
+		}
+
+		if data.FchServHasta == nil {
+			return errors.New("missing required field for this voucher: FchServDesde")
+		}
+
+		if data.FchVtoPago == nil {
+			return errors.New("missing required field for this voucher: FchServDesde")
+		}
+
+		r.FchServDesde = data.FchServDesde
+		r.FchServHasta = data.FchServHasta
+		r.FchVtoPago = data.FchVtoPago
+	}
+
+	/*
+		If document type is final consumer set document
+		number as zero.
+	*/
+	if r.DocTipo == document.CF {
+		r.DocNro = 0
+	}
+
+	f := false
+
+	if r.CompradorIvaExento == nil {
+		r.CompradorIvaExento = &f
+	}
+
+	if r.PagoContado == nil {
+		r.PagoContado = &f
+	}
+
+	if r.GeneratePDF == nil {
+		r.GeneratePDF = &f
+	}
+
+	if (r.MonId != nil && r.MonCotiz == nil) || (r.MonId == nil && r.MonCotiz != nil) {
+		return errors.New("if you send one of this fields (MonId or MonCotiz) you must send the other too")
+	}
+
+	if r.MonId == nil {
+		ars := "PES"
+		arsCot := 1.0
+		r.MonId = &ars
+		r.MonCotiz = &arsCot
+	}
+
+	apiStatus, err := e.afip.HttpClient.Post(endpoints.INVOICE, r, response)
+	if err != nil {
+		return err
+	}
+
+	if apiStatus.Status.Type != gofip.SUCCESS {
+		return fmt.Errorf("error (%s): %s", apiStatus.Status.Code, apiStatus.Status.Description)
+	}
+
 	return nil
 }
 
@@ -193,8 +294,19 @@ func (e *eBilling) GetDocumentTypes() (interface{}, error) {
 	return nil, nil
 }
 
-func (e *eBilling) GetAliquotTypes() (interface{}, error) {
-	return nil, nil
+func (e *eBilling) GetAliquotTypes() (*responses.GetAliquotTypesResponse, error) {
+	var res responses.GetAliquotTypesResponse
+
+	apiResponse, err := e.afip.HttpClient.Get(endpoints.ALIQUOTS, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != gofip.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return &res, nil
 }
 
 func (e *eBilling) GetCurrenciesTypes() (interface{}, error) {

@@ -1,6 +1,9 @@
 package voucher
 
-import "github.com/seuscode/afip-sdk-go/domain/document"
+import (
+	"github.com/seuscode/afip-sdk-go/domain/aliquot"
+	"github.com/seuscode/afip-sdk-go/domain/document"
+)
 
 type (
 	VoucherType    uint
@@ -36,15 +39,15 @@ type (
 	}
 
 	VoucherItems struct {
-		Id             string  `json:"Id"`
-		Qty            float64 `json:"Qty"`
-		Iva            float64 `json:"Iva"`
-		Price          float64 `json:"Price"`
-		Desc           string  `json:"Desc"`
-		Discount       float64 `json:"DiscountPercent"`
-		Subtotal       float64 `json:"Subtotal"`
-		IvaExento      bool    `json:"IvaExento"`
-		NoGravadodeIVA bool    `json:"NoGravadodeIVA"`
+		Id             string            `json:"Id"`
+		Qty            float64           `json:"Qty"`
+		Iva            aliquot.AliquotId `json:"Iva"`
+		Price          float64           `json:"Price"`
+		Desc           string            `json:"Desc"`
+		Discount       float64           `json:"DiscountPercent"`
+		Subtotal       float64           `json:"Subtotal"`
+		IvaExento      bool              `json:"IvaExento"`
+		NoGravadodeIVA bool              `json:"NoGravadodeIVA"`
 	}
 
 	VoucherTributes struct {

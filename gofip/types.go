@@ -1,6 +1,6 @@
 package gofip
 
-import "github.com/seuscode/afip-sdk-go/domain/fiscal"
+import "github.com/seuscode/bill-sdk-go/domain/fiscal"
 
 type (
 	Enviroment uint

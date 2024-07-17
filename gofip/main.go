@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/seuscode/afip-sdk-go/domain/api/requests"
-	"github.com/seuscode/afip-sdk-go/domain/api/responses"
-	"github.com/seuscode/afip-sdk-go/domain/fiscal"
-	"github.com/seuscode/afip-sdk-go/endpoints"
+	"github.com/seuscode/bill-sdk-go/domain/api/requests"
+	"github.com/seuscode/bill-sdk-go/domain/api/responses"
+	"github.com/seuscode/bill-sdk-go/domain/fiscal"
+	"github.com/seuscode/bill-sdk-go/endpoints"
 )
 
 type Gofip struct {

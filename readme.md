@@ -1,8 +1,8 @@
-# Gofip - Fastest sdk to consume afip ws
+# BILL - Fastest sdk to implement invoices
 
-[![Latest Release](https://img.shields.io/github/release/SeusCode/gofip.svg)](https://github.com/seuscode/afip-sdk-go/releases)
-[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/seuscode/afip-sdk-go)
-[![Coverage Status](https://coveralls.io/repos/github/SeusCode/gofip/badge.svg?branch=main)](https://coveralls.io/github/SeusCode/afip-sdk-go?branch=main)
+[![Latest Release](https://img.shields.io/github/release/SeusCode/gofip.svg)](https://github.com/seuscode/bill-sdk-go/releases)
+[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/seuscode/bill-sdk-go)
+[![Coverage Status](https://coveralls.io/repos/github/SeusCode/gofip/badge.svg?branch=main)](https://coveralls.io/github/seuscode/bill-sdk-go?branch=main)
 
 ## Description
 

@@ -1,3 +1,3 @@
-module github.com/seuscode/afip-sdk-go
+module github.com/seuscode/bill-sdk-go
 
 go 1.22.2

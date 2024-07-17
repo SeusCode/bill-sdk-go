@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/seuscode/afip-sdk-go/domain/api/requests"
-	"github.com/seuscode/afip-sdk-go/domain/api/responses"
-	"github.com/seuscode/afip-sdk-go/domain/document"
-	"github.com/seuscode/afip-sdk-go/domain/voucher"
-	"github.com/seuscode/afip-sdk-go/endpoints"
-	"github.com/seuscode/afip-sdk-go/gofip"
+	"github.com/seuscode/bill-sdk-go/domain/api/requests"
+	"github.com/seuscode/bill-sdk-go/domain/api/responses"
+	"github.com/seuscode/bill-sdk-go/domain/document"
+	"github.com/seuscode/bill-sdk-go/domain/voucher"
+	"github.com/seuscode/bill-sdk-go/endpoints"
+	"github.com/seuscode/bill-sdk-go/gofip"
 )
 
 type ElectronicBilling interface {
@@ -86,7 +86,7 @@ type ElectronicBilling interface {
 	 *
 	 * @return array All sales points availables
 	 **/
-	GetSalesPoints() (interface{}, error)
+	GetSalesPoints() (*responses.GetPointsOfSaleResponse, error)
 
 	/**
 	 * Asks to AFIP Servers for voucher types availables {@see WS
@@ -102,7 +102,7 @@ type ElectronicBilling interface {
 	 *
 	 * @return array All voucher concepts availables
 	 **/
-	GetConceptTypes() (interface{}, error)
+	GetConceptTypes() (*responses.GetConceptTypesResponse, error)
 
 	/**
 	 * Asks to AFIP Servers for document types availables {@see WS
@@ -110,7 +110,7 @@ type ElectronicBilling interface {
 	 *
 	 * @return array All document types availables
 	 **/
-	GetDocumentTypes() (interface{}, error)
+	GetDocumentTypes() (*responses.GetDocumentTypesResponse, error)
 
 	/**
 	 * Asks to AFIP Servers for aliquot availables {@see WS
@@ -126,15 +126,7 @@ type ElectronicBilling interface {
 	 *
 	 * @return array All currencies availables
 	 **/
-	GetCurrenciesTypes() (interface{}, error)
-
-	/**
-	 * Asks to AFIP Servers for voucher optional data available {@see WS
-	 * Specification item 4.9}
-	 *
-	 * @return array All voucher optional data available
-	 **/
-	GetOptionsTypes() (interface{}, error)
+	GetCurrenciesTypes() (*responses.GetCurrencyTypesResponse, error)
 
 	/**
 	 * Asks to AFIP Servers for tax availables {@see WS
@@ -142,17 +134,7 @@ type ElectronicBilling interface {
 	 *
 	 * @return array All tax availables
 	 **/
-	GetTaxTypes() (interface{}, error)
-
-	/**
-	 * Asks to web service for servers status {@see WS
-	 * Specification item 4.14}
-	 *
-	 * @return object { AppServer : Web Service status,
-	 * DbServer : Database status, AuthServer : Autentication
-	 * server status}
-	 **/
-	//GetServerStatus() (interface{}, error)
+	GetTaxTypes() (*responses.GetTaxTypesResponse, error)
 }
 
 type eBilling struct {
@@ -278,20 +260,64 @@ func (e *eBilling) GetVoucherInfo(voucherNumber, voucherPos int, voucherType vou
 
 }
 
-func (e *eBilling) GetSalesPoints() (interface{}, error) {
-	return nil, nil
+func (e *eBilling) GetSalesPoints() (*responses.GetPointsOfSaleResponse, error) {
+	var res responses.GetPointsOfSaleResponse
+
+	apiResponse, err := e.afip.HttpClient.Get(endpoints.SALES_POINTS, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != gofip.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return &res, nil
 }
 
 func (e *eBilling) GetVoucherTypes() (interface{}, error) {
-	return nil, nil
+	var res interface{}
+
+	apiResponse, err := e.afip.HttpClient.Get(endpoints.VOUCHERS, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != gofip.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return res, nil
 }
 
-func (e *eBilling) GetConceptTypes() (interface{}, error) {
-	return nil, nil
+func (e *eBilling) GetConceptTypes() (*responses.GetConceptTypesResponse, error) {
+	var res responses.GetConceptTypesResponse
+
+	apiResponse, err := e.afip.HttpClient.Get(endpoints.CONCEPTS, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != gofip.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return &res, nil
 }
 
-func (e *eBilling) GetDocumentTypes() (interface{}, error) {
-	return nil, nil
+func (e *eBilling) GetDocumentTypes() (*responses.GetDocumentTypesResponse, error) {
+	var res responses.GetDocumentTypesResponse
+
+	apiResponse, err := e.afip.HttpClient.Get(endpoints.DOCUMENTS, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != gofip.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return &res, nil
 }
 
 func (e *eBilling) GetAliquotTypes() (*responses.GetAliquotTypesResponse, error) {
@@ -309,14 +335,32 @@ func (e *eBilling) GetAliquotTypes() (*responses.GetAliquotTypesResponse, error)
 	return &res, nil
 }
 
-func (e *eBilling) GetCurrenciesTypes() (interface{}, error) {
-	return nil, nil
+func (e *eBilling) GetCurrenciesTypes() (*responses.GetCurrencyTypesResponse, error) {
+	var res responses.GetCurrencyTypesResponse
+
+	apiResponse, err := e.afip.HttpClient.Get(endpoints.CURRENCIES, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != gofip.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return &res, nil
 }
 
-func (e *eBilling) GetOptionsTypes() (interface{}, error) {
-	return nil, nil
-}
+func (e *eBilling) GetTaxTypes() (*responses.GetTaxTypesResponse, error) {
+	var res responses.GetTaxTypesResponse
 
-func (e *eBilling) GetTaxTypes() (interface{}, error) {
-	return nil, nil
+	apiResponse, err := e.afip.HttpClient.Get(endpoints.TAXES, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != gofip.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return &res, nil
 }

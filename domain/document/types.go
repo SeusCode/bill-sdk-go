@@ -2,6 +2,13 @@ package document
 
 type (
 	DocumentType uint
+
+	Document struct {
+		Id        DocumentType `json:"Id"`
+		Desc      string       `json:"Desc"`
+		StartDate string       `json:"FchDesde"`
+		EndDate   string       `json:"FchHasta"`
+	}
 )
 
 const (

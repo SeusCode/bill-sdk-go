@@ -1,6 +1,6 @@
 package responses
 
-import "github.com/seuscode/afip-sdk-go/domain/aliquot"
+import "github.com/seuscode/bill-sdk-go/domain/aliquot"
 
 type (
 	GetAliquotTypesResponse struct {

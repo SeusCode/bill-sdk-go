@@ -1,8 +1,8 @@
 package voucher
 
 import (
-	"github.com/seuscode/afip-sdk-go/domain/aliquot"
-	"github.com/seuscode/afip-sdk-go/domain/document"
+	"github.com/seuscode/bill-sdk-go/domain/aliquot"
+	"github.com/seuscode/bill-sdk-go/domain/document"
 )
 
 type (

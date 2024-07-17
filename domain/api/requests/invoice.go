@@ -1,8 +1,8 @@
 package requests
 
 import (
-	"github.com/seuscode/afip-sdk-go/domain/document"
-	"github.com/seuscode/afip-sdk-go/domain/voucher"
+	"github.com/seuscode/bill-sdk-go/domain/document"
+	"github.com/seuscode/bill-sdk-go/domain/voucher"
 )
 
 type (

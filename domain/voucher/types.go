@@ -9,6 +9,13 @@ type (
 	VoucherType    uint
 	VoucherConcept uint
 
+	Type struct {
+		Id        VoucherType `json:"Id"`
+		Desc      string      `json:"Desc"`
+		StartDate string      `json:"FchDesde"`
+		EndDate   string      `json:"FchHasta"`
+	}
+
 	Voucher struct {
 		CbteTipo VoucherType    `json:"CbteTipo"`
 		Concepto VoucherConcept `json:"Concepto"`

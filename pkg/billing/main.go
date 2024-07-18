@@ -94,7 +94,7 @@ type ElectronicBilling interface {
 	 *
 	 * @return array All voucher types availables
 	 **/
-	GetVoucherTypes() (interface{}, error)
+	GetVoucherTypes(onlySystemAvailable bool) (*responses.GetVoucherTypesResponse, error)
 
 	/**
 	 * Asks to AFIP Servers for voucher concepts availables {@see WS
@@ -275,10 +275,15 @@ func (e *eBilling) GetSalesPoints() (*responses.GetPointsOfSaleResponse, error) 
 	return &res, nil
 }
 
-func (e *eBilling) GetVoucherTypes() (interface{}, error) {
-	var res interface{}
+func (e *eBilling) GetVoucherTypes(onlySystemAvailable bool) (*responses.GetVoucherTypesResponse, error) {
+	var res responses.GetVoucherTypesResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(endpoints.VOUCHERS, &res)
+	apiEndpoint := endpoints.VOUCHERS
+	if onlySystemAvailable {
+		apiEndpoint += "/SystemValids"
+	}
+
+	apiResponse, err := e.afip.HttpClient.Get(apiEndpoint, &res)
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +292,7 @@ func (e *eBilling) GetVoucherTypes() (interface{}, error) {
 		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
-	return res, nil
+	return &res, nil
 }
 
 func (e *eBilling) GetConceptTypes() (*responses.GetConceptTypesResponse, error) {

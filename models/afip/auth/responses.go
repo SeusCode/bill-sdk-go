@@ -1,14 +1,14 @@
 package auth
 
 type (
-	AuthServerStatus struct {
+	ServerStatus struct {
 		DbServer   string `json:"DbServer"`
 		AppServer  string `json:"AppServer"`
 		AuthServer string `json:"AuthServer"`
 	}
 
 	AuthResponse struct {
-		JWT          string           `json:"jwt"`
-		ServerStatus AuthServerStatus `json:"server_status"`
+		JWT          string       `json:"jwt"`
+		ServerStatus ServerStatus `json:"server_status"`
 	}
 )

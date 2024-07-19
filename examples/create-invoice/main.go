@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/seuscode/bill-sdk-go/domain/aliquot"
-	"github.com/seuscode/bill-sdk-go/domain/api/responses"
-	"github.com/seuscode/bill-sdk-go/domain/document"
-	"github.com/seuscode/bill-sdk-go/domain/fiscal"
-	"github.com/seuscode/bill-sdk-go/domain/voucher"
-	"github.com/seuscode/bill-sdk-go/gofip"
-	"github.com/seuscode/bill-sdk-go/pkg/billing"
+	"github.com/seuscode/bill-sdk-go/api/afip"
+	"github.com/seuscode/bill-sdk-go/models/afip/aliquot"
+	"github.com/seuscode/bill-sdk-go/models/afip/document"
+	"github.com/seuscode/bill-sdk-go/models/afip/fiscal"
+	"github.com/seuscode/bill-sdk-go/models/afip/voucher"
+	"github.com/seuscode/bill-sdk-go/models/api"
 )
 
 func main() {
@@ -29,7 +28,7 @@ func main() {
 		panic(fmt.Errorf("could not read the private key %w", err))
 	}
 
-	afip, err := gofip.NewGofip(gofip.GofipOptions{
+	afip, err := afip.NewAfipManager(afip.AfipOptions{
 		Certificate: certificate,
 		PrivateKey:  privateKey,
 
@@ -40,7 +39,7 @@ func main() {
 		FiscalType:      fiscal.IVA_RESPONSABLE_INSCRIPTO,
 		StartOfActivity: "YOUR START OF ACTIVITY DATE", // (dd/mm/yyyy)
 		PointOfSale:     1,
-		Enviroment:      gofip.PRODUCTION,
+		Enviroment:      api.PRODUCTION,
 	})
 
 	if err != nil {
@@ -52,10 +51,8 @@ func main() {
 		panic(fmt.Errorf("error happend on GetAuthToken %w", err))
 	}
 
-	afipElectronicBilling := billing.NewElectronicBilling(afip, billing.BillingOptions{})
-
-	var resp responses.CreateInvoiceResponse
-	err = afipElectronicBilling.CreateVoucher(&voucher.Voucher{
+	var resp voucher.CreateVoucherResponse
+	err = afip.EBilling.CreateVoucher(&voucher.Voucher{
 		CbteTipo: voucher.FacturaA,
 		Concepto: voucher.Productos,
 

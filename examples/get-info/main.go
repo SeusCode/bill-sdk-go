@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/seuscode/bill-sdk-go/domain/fiscal"
-	"github.com/seuscode/bill-sdk-go/gofip"
-	"github.com/seuscode/bill-sdk-go/pkg/billing"
+	"github.com/seuscode/bill-sdk-go/api/afip"
+	"github.com/seuscode/bill-sdk-go/models/afip/fiscal"
+	"github.com/seuscode/bill-sdk-go/models/api"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 		panic(fmt.Errorf("could not read the private key %w", err))
 	}
 
-	afip, err := gofip.NewGofip(gofip.GofipOptions{
+	afip, err := afip.NewAfipManager(afip.AfipOptions{
 		Certificate: certificate,
 		PrivateKey:  privateKey,
 
@@ -36,7 +36,7 @@ func main() {
 		FiscalType:      fiscal.IVA_RESPONSABLE_INSCRIPTO,
 		StartOfActivity: "YOUR START OF ACTIVITY DATE", // (dd/mm/yyyy)
 		PointOfSale:     1,
-		Enviroment:      gofip.PRODUCTION,
+		Enviroment:      api.PRODUCTION,
 	})
 
 	if err != nil {
@@ -48,8 +48,7 @@ func main() {
 		panic(fmt.Errorf("error happend on GetAuthToken %w", err))
 	}
 
-	afipElectronicBilling := billing.NewElectronicBilling(afip, billing.BillingOptions{})
-	resp, err := afipElectronicBilling.GetAliquotTypes()
+	resp, err := afip.EBilling.GetAliquotTypes()
 
 	if err != nil {
 		panic(err)
@@ -59,7 +58,7 @@ func main() {
 	fmt.Println(resp)
 	fmt.Println("================ aliquots end ================")
 
-	conceptResponse, err := afipElectronicBilling.GetConceptTypes()
+	conceptResponse, err := afip.EBilling.GetConceptTypes()
 
 	if err != nil {
 		panic(err)
@@ -69,7 +68,7 @@ func main() {
 	fmt.Println(*conceptResponse)
 	fmt.Println("================ concepts end ================")
 
-	docResponse, err := afipElectronicBilling.GetDocumentTypes()
+	docResponse, err := afip.EBilling.GetDocumentTypes()
 
 	if err != nil {
 		panic(err)
@@ -79,7 +78,7 @@ func main() {
 	fmt.Println(docResponse)
 	fmt.Println("================ documents end ================")
 
-	currenciesResponse, err := afipElectronicBilling.GetCurrenciesTypes()
+	currenciesResponse, err := afip.EBilling.GetCurrenciesTypes()
 
 	if err != nil {
 		panic(err)
@@ -89,7 +88,7 @@ func main() {
 	fmt.Println(currenciesResponse)
 	fmt.Println("================ currencies end ================")
 
-	posResponse, err := afipElectronicBilling.GetSalesPoints()
+	posResponse, err := afip.EBilling.GetSalesPoints()
 
 	if err != nil {
 		panic(err)
@@ -99,7 +98,7 @@ func main() {
 	fmt.Println(posResponse)
 	fmt.Println("================ pointofsales end ================")
 
-	taxResponse, err := afipElectronicBilling.GetTaxTypes()
+	taxResponse, err := afip.EBilling.GetTaxTypes()
 
 	if err != nil {
 		panic(err)
@@ -109,7 +108,7 @@ func main() {
 	fmt.Println(taxResponse)
 	fmt.Println("================ taxtypes end ================")
 
-	voucherResponse, err := afipElectronicBilling.GetVoucherTypes(false)
+	voucherResponse, err := afip.EBilling.GetVoucherTypes(false)
 
 	if err != nil {
 		panic(err)

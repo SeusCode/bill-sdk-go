@@ -10,7 +10,7 @@ type (
 		Concepto VoucherConcept `json:"Concepto"`
 
 		DocTipo document.DocumentType `json:"DocTipo"`
-		DocNro  int                   `json:"DocNro"`
+		DocNro  int64                 `json:"DocNro"`
 
 		CbteFch *string `json:"CbteFch,omitempty"`
 
@@ -32,5 +32,9 @@ type (
 
 		MonId    *string  `json:"MonId,omitempty"`
 		MonCotiz *float64 `json:"MonCotiz,omitempty"`
+
+		Phone   *string `json:"tel,omitempty"`
+		Email   *string `json:"email,omitempty"`
+		Website *string `json:"MonCowebtiz,omitempty"`
 	}
 )

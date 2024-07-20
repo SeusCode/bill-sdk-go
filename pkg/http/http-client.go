@@ -118,6 +118,45 @@ func (c *HttpClient) Get(endpoint string, expectedResponse interface{}) (*ApiRes
 	return apiResponse, nil
 }
 
+func (c *HttpClient) GetWithBody(endpoint string, data interface{}, expectedResponse interface{}) (*ApiResponse, error) {
+	c.validateToken()
+
+	type apiRequest struct {
+		Data interface{} `json:"data"`
+	}
+
+	apiReq := apiRequest{
+		Data: data,
+	}
+
+	jsonData, err := json.Marshal(apiReq)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(GET, fmt.Sprintf("%s%s", c.BaseURL, endpoint), bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := c.HandleErrorResponse(resp); err != nil {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("%w: %s", err, string(bodyBytes))
+	}
+
+	apiResponse, err := c.bodyParser(resp, expectedResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return apiResponse, nil
+}
+
 func (c *HttpClient) Post(endpoint string, data interface{}, expectedResponse interface{}) (*ApiResponse, error) {
 	c.validateToken()
 

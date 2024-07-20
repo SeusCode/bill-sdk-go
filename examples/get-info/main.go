@@ -48,73 +48,73 @@ func main() {
 		panic(fmt.Errorf("error happend on GetAuthToken %w", err))
 	}
 
+	fmt.Println("\n\n================ aliquots ================")
 	resp, err := afip.EBilling.GetAliquotTypes()
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("\n\n================ aliquots ================")
 	fmt.Println(resp)
 	fmt.Println("================ aliquots end ================")
 
+	fmt.Println("\n\n================ concepts ================")
 	conceptResponse, err := afip.EBilling.GetConceptTypes()
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("\n\n================ concepts ================")
 	fmt.Println(*conceptResponse)
 	fmt.Println("================ concepts end ================")
 
+	fmt.Println("\n\n================ documents ================")
 	docResponse, err := afip.EBilling.GetDocumentTypes()
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("\n\n================ documents ================")
 	fmt.Println(docResponse)
 	fmt.Println("================ documents end ================")
 
+	fmt.Println("\n\n================ currencies ================")
 	currenciesResponse, err := afip.EBilling.GetCurrenciesTypes()
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("\n\n================ currencies ================")
 	fmt.Println(currenciesResponse)
 	fmt.Println("================ currencies end ================")
 
+	fmt.Println("\n\n================ pointofsales ================")
 	posResponse, err := afip.EBilling.GetSalesPoints()
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("\n\n================ pointofsales ================")
 	fmt.Println(posResponse)
 	fmt.Println("================ pointofsales end ================")
 
+	fmt.Println("\n\n================ taxtypes ================")
 	taxResponse, err := afip.EBilling.GetTaxTypes()
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("\n\n================ taxtypes ================")
 	fmt.Println(taxResponse)
 	fmt.Println("================ taxtypes end ================")
 
-	voucherResponse, err := afip.EBilling.GetVoucherTypes(false)
+	fmt.Println("\n\n================ vouchertypes ================")
+	voucherResponse, err := afip.EBilling.GetVoucherTypes(true)
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("\n\n================ vouchertypes ================")
 	fmt.Println(voucherResponse)
 	fmt.Println("================ vouchertypes end ================")
 }

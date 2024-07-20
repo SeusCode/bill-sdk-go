@@ -58,6 +58,9 @@ type (
 
 		// Electronic billing interface to access the functions
 		EBilling electronicBilling
+
+		// Citizen registry interface to access the functions
+		Registry citizenRegistry
 	}
 
 	AfipOptions struct {
@@ -130,6 +133,7 @@ func NewAfipManager(opts AfipOptions) (*afipData, error) {
 
 	afipManager.HttpClient = http.NewHttpClient(&afipManager.authToken, config.API_BASE_URL)
 	afipManager.EBilling = newElectronicBilling(afipManager)
+	afipManager.Registry = newCitizenRegistry(afipManager)
 
 	go afipManager.startTokenRenewal()
 
@@ -225,23 +229,23 @@ func (g *afipData) SessionAlive() error {
 	return nil
 }
 
-// Función para ejecutar la rutina de renovación de token
 func (g *afipData) startTokenRenewal() {
-	// Crear un ticker que se dispare cada hora
 	ticker := time.NewTicker(1 * time.Hour)
 	defer ticker.Stop()
 
-	// Ejecutar la función inmediatamente al inicio
-	if err := g.SessionAlive(); err != nil {
-		fmt.Println("[WARNING] Could not renew afip token end date, trying get a new one.")
-		backoff.RetryWithBackoff(g.GetAuthToken, "[ERROR] Could not get a new token, retrying in", "[SUCCESS] New token obtained successfully")
+	if g.authToken != "" {
+		if err := g.SessionAlive(); err != nil {
+			fmt.Println("[WARNING] Could not renew afip token end date, trying get a new one.")
+			backoff.RetryWithBackoff(g.GetAuthToken, "[ERROR] Could not get a new token, retrying in", "[SUCCESS] New token obtained successfully")
+		}
 	}
 
-	// Loop para esperar que el ticker se dispare o recibir la señal de parada
 	for range ticker.C {
-		err := g.SessionAlive()
-		if err != nil {
-			backoff.RetryWithBackoff(g.GetAuthToken, "[ERROR] Could not get a new token, retrying in", "[SUCCESS] New token obtained successfully")
+		if g.authToken != "" {
+			err := g.SessionAlive()
+			if err != nil {
+				backoff.RetryWithBackoff(g.GetAuthToken, "[ERROR] Could not get a new token, retrying in", "[SUCCESS] New token obtained successfully")
+			}
 		}
 	}
 }

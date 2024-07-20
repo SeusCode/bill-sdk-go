@@ -181,6 +181,10 @@ func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.Create
 
 		MonId:    data.MonId,
 		MonCotiz: data.MonCotiz,
+
+		Phone:   data.Phone,
+		Email:   data.Email,
+		Website: data.Website,
 	}
 
 	/*

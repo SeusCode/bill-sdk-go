@@ -21,7 +21,7 @@ type (
 		Concepto VoucherConcept `json:"Concepto"`
 
 		DocTipo document.DocumentType `json:"DocTipo"`
-		DocNro  int                   `json:"DocNro"`
+		DocNro  int64                 `json:"DocNro"`
 
 		CbteFch *string `json:"CbteFch,omitempty"`
 
@@ -43,6 +43,10 @@ type (
 
 		MonId    *string  `json:"MonId,omitempty"`
 		MonCotiz *float64 `json:"MonCotiz,omitempty"`
+
+		Phone   *string `json:"tel,omitempty"`
+		Email   *string `json:"email,omitempty"`
+		Website *string `json:"MonCowebtiz,omitempty"`
 	}
 
 	VoucherItems struct {
@@ -60,7 +64,7 @@ type (
 	VoucherTributes struct {
 		Id      int     `json:"Id"`
 		Desc    string  `json:"Desc"`
-		BaseImp int     `json:"BaseImp"`
+		BaseImp float64 `json:"BaseImp"`
 		Alic    float64 `json:"Alic"`
 		Total   float64 `json:"Importe"`
 	}
@@ -72,7 +76,7 @@ type (
 
 	VoucherShare struct {
 		Id      int     `json:"Id"`
-		BaseImp int     `json:"BaseImp"`
+		BaseImp float64 `json:"BaseImp"`
 		Total   float64 `json:"Importe"`
 	}
 

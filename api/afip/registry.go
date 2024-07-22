@@ -53,7 +53,7 @@ func (c *cRegistry) GetPersonInformation(registryNumber int, citizenDocument int
 		r.CitizenId = citizenDocument
 	}
 
-	apiData, err := c.afip.HttpClient.GetWithBody(endpoints.CITIZEN_DATA, r, &resp)
+	apiData, err := c.afip.HttpClient.Post(endpoints.CITIZEN_DATA, r, &resp)
 	if err != nil {
 		return nil, err
 	}

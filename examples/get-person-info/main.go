@@ -51,12 +51,12 @@ func main() {
 		panic(fmt.Errorf("error happend on GetAuthToken %w", err))
 	}
 
-	personIDs := []int{
+	personIDs := []int64{
 		// Add here all the taxId of person you want to get the info
 	}
 
 	for _, personID := range personIDs {
-		res, err := afip.Registry.GetPersonInformation(13, int64(personID), document.CUIT)
+		res, err := afip.Registry.GetPersonInformation(13, personID, document.CUIT)
 		if err != nil {
 			log.Fatalf("Error getting information for personID %d: %v", personID, err)
 		}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -117,4 +118,35 @@ func main() {
 
 	fmt.Println(voucherResponse)
 	fmt.Println("================ vouchertypes end ================")
+
+	fmt.Println("\n\n================ payment methods ================")
+	pmResponse, err := afip.EBilling.GetPaymentMethods()
+
+	if err != nil {
+		panic(err)
+	}
+
+	js, _ := json.Marshal(pmResponse)
+	fmt.Println(string(js))
+	fmt.Println("================ payment methods end ================")
+
+	fmt.Println("\n\n================ optionals ================")
+	opResponse, err := afip.EBilling.GetOptionalTypes()
+	if err != nil {
+		panic(err)
+	}
+
+	jsO, _ := json.Marshal(opResponse)
+	fmt.Println(string(jsO))
+	fmt.Println("================ optionals end ================")
+
+	fmt.Println("\n\n================ cotizations ================")
+	cotResponse, err := afip.EBilling.GetCurrencyCotization("DOL")
+	if err != nil {
+		panic(err)
+	}
+
+	jsC, _ := json.Marshal(cotResponse)
+	fmt.Println(string(jsC))
+	fmt.Println("================ cotizations end ================")
 }

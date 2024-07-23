@@ -8,6 +8,8 @@ import (
 	"github.com/seuscode/bill-sdk-go/models/afip/concept"
 	"github.com/seuscode/bill-sdk-go/models/afip/currency"
 	"github.com/seuscode/bill-sdk-go/models/afip/document"
+	"github.com/seuscode/bill-sdk-go/models/afip/optionals"
+	"github.com/seuscode/bill-sdk-go/models/afip/payment_method"
 	"github.com/seuscode/bill-sdk-go/models/afip/pos"
 	"github.com/seuscode/bill-sdk-go/models/afip/tax"
 	"github.com/seuscode/bill-sdk-go/models/afip/voucher"
@@ -71,7 +73,7 @@ type electronicBilling interface {
 	 * @return array|null returns array with complete voucher information
 	 * 	{@see WS Specification item 4.19} or null if there not exists
 	 **/
-	GetVoucherInfo(voucherNumber, voucherPos int, voucherType voucher.VoucherType) error
+	GetVoucherInfo(voucherNumber, voucherPos int, voucherType voucher.VoucherType) (*voucher.GetVoucherInfoResponse, error)
 
 	/**
 	 * Create CAEA (Código de Autorización Electrónico Anticipado)
@@ -138,6 +140,27 @@ type electronicBilling interface {
 	 * @return array All tax availables
 	 **/
 	GetTaxTypes() (*tax.GetTaxTypesResponse, error)
+
+	/**
+	 * Asks to AFIP Servers for a currency cotization
+	 *
+	 * @return array All currency cotization i
+	 **/
+	GetCurrencyCotization(currencyId string) (*currency.GetCurrencyCotizationResponse, error)
+
+	/**
+	 * Asks to AFIP Servers for optional types
+	 *
+	 * @return array All optionals availables
+	 **/
+	GetOptionalTypes() (*optionals.GetOptionalTypesResponse, error)
+
+	/**
+	 * Asks to our API Servers for payment methods
+	 *
+	 * @return array All payment methods availables
+	 **/
+	GetPaymentMethods() (*payment_method.GetPaymentMethodsResponse, error)
 }
 
 type eBilling struct {
@@ -259,9 +282,19 @@ func (e *eBilling) CreatePDF(data interface{}) error {
 	return nil
 }
 
-func (e *eBilling) GetVoucherInfo(voucherNumber, voucherPos int, voucherType voucher.VoucherType) error {
-	return nil
+func (e *eBilling) GetVoucherInfo(voucherNumber, voucherPos int, voucherType voucher.VoucherType) (*voucher.GetVoucherInfoResponse, error) {
+	var res voucher.GetVoucherInfoResponse
 
+	apiResponse, err := e.afip.HttpClient.Get(fmt.Sprintf("%s/%d/%d/%d", endpoints.INVOICE, voucherType, voucherPos, voucherNumber), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != http.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return &res, nil
 }
 
 func (e *eBilling) GetSalesPoints() (*pos.GetPointsOfSaleResponse, error) {
@@ -363,6 +396,51 @@ func (e *eBilling) GetTaxTypes() (*tax.GetTaxTypesResponse, error) {
 	var res tax.GetTaxTypesResponse
 
 	apiResponse, err := e.afip.HttpClient.Get(endpoints.TAXES, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != http.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return &res, nil
+}
+
+func (e *eBilling) GetPaymentMethods() (*payment_method.GetPaymentMethodsResponse, error) {
+	var res payment_method.GetPaymentMethodsResponse
+
+	apiResponse, err := e.afip.HttpClient.Get(endpoints.PAYMENT_METHODS, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != http.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return &res, nil
+}
+
+func (e *eBilling) GetCurrencyCotization(currencyId string) (*currency.GetCurrencyCotizationResponse, error) {
+	var res currency.GetCurrencyCotizationResponse
+
+	apiResponse, err := e.afip.HttpClient.Get(fmt.Sprintf("%s/%s", endpoints.COTIZATIONS, currencyId), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	if apiResponse.Status.Type != http.SUCCESS {
+		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
+	}
+
+	return &res, nil
+}
+
+func (e *eBilling) GetOptionalTypes() (*optionals.GetOptionalTypesResponse, error) {
+	var res optionals.GetOptionalTypesResponse
+
+	apiResponse, err := e.afip.HttpClient.Get(endpoints.OPTIONALS, &res)
 	if err != nil {
 		return nil, err
 	}

@@ -9,13 +9,16 @@ const (
 	GET_QR  = "/get-qr"
 	INVOICE = "/invoice"
 
-	TAXES        = "/taxes"
-	CONCEPTS     = "/concepts"
-	ALIQUOTS     = "/aliquots"
-	VOUCHERS     = "/vouchers"
-	DOCUMENTS    = "/documents"
-	CURRENCIES   = "/currencies"
-	SALES_POINTS = "/sales-points"
+	TAXES           = "/taxes"
+	CONCEPTS        = "/concepts"
+	ALIQUOTS        = "/aliquots"
+	VOUCHERS        = "/vouchers"
+	OPTIONALS       = "/optionals"
+	DOCUMENTS       = "/documents"
+	CURRENCIES      = "/currencies"
+	COTIZATIONS     = "/getcotiz"
+	SALES_POINTS    = "/sales-points"
+	PAYMENT_METHODS = "/payments"
 
 	CITIZEN_DATA = "/getpersoninfo"
 )

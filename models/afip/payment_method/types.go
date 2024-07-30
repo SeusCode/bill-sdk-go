@@ -14,4 +14,5 @@ const (
 	CreditCard      SellConditionId = 3
 	Check           SellConditionId = 4
 	CheckingAccount SellConditionId = 5
+	Other           SellConditionId = 8
 )

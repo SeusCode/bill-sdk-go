@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path"
 	"reflect"
 	"strings"
 	"time"
-
-	"github.com/seuscode/bill-sdk-go/pkg/endpoints"
 )
 
 type (
@@ -154,19 +154,45 @@ func (c *HttpClient) Post(endpoint string, data interface{}, expectedResponse in
 		return nil, err
 	}
 
-	if endpoint == endpoints.INVOICE {
-		fmt.Println("===========================")
-		fmt.Println(string(jsonData))
-		fmt.Println("===========================")
+	return apiResponse, nil
+}
 
-		jsonData, _ := json.Marshal(apiResponse.Data)
+func (c *HttpClient) PostWithFileOnResponse(endpoint string, data interface{}, folderName, fileName string) error {
+	c.validateToken()
 
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-		fmt.Println(string(jsonData))
-		fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+	type apiRequest struct {
+		Data interface{} `json:"data"`
 	}
 
-	return apiResponse, nil
+	apiReq := apiRequest{
+		Data: data,
+	}
+
+	jsonData, err := json.Marshal(apiReq)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(POST, fmt.Sprintf("%s%s", c.BaseURL, endpoint), bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if err := c.HandleErrorResponse(resp); err != nil {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("%w: %s", err, string(bodyBytes))
+	}
+
+	if err := c.saveResponseFile(resp, folderName, fileName); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c *HttpClient) bodyParser(r *http.Response, expectedResponse interface{}) (*ApiResponse, error) {
@@ -202,6 +228,30 @@ func (c *HttpClient) bodyParser(r *http.Response, expectedResponse interface{}) 
 	}
 
 	return &resp, nil
+}
+
+func (c *HttpClient) saveResponseFile(r *http.Response, folderName, fileName string) error {
+	// Create or truncate the file to save the PDF
+	finalPath := path.Clean(fmt.Sprintf("./%s/%s", folderName, fileName))
+
+	err := os.MkdirAll(path.Dir(finalPath), 0777)
+	if err != nil {
+		return fmt.Errorf("error creating folder: %v", err)
+	}
+
+	file, err := os.Create(finalPath)
+	if err != nil {
+		return fmt.Errorf("error creating file: %v", err)
+	}
+	defer file.Close()
+
+	// Copy the response body content to the file
+	_, err = io.Copy(file, r.Body)
+	if err != nil {
+		return fmt.Errorf("error copying response body to file: %v", err)
+	}
+
+	return nil
 }
 
 func (c *HttpClient) validateToken() {

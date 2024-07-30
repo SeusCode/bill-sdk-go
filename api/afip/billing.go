@@ -25,7 +25,7 @@ type electronicBilling interface {
 	 *
 	 * @param {object} data Data for PDF creation
 	**/
-	CreatePDF(data interface{}) error
+	CreatePDF(data voucher.VoucherPDF, folderName, fileName string) error
 
 	/*
 	 Create a voucher from AFIP
@@ -46,21 +46,6 @@ type electronicBilling interface {
 	CreateVoucher(data *voucher.Voucher, response *voucher.CreateVoucherResponse) error
 
 	/**
-	 * Create next voucher from AFIP
-	 *
-	 * This method combines Afip.getLastVoucher and Afip.createVoucher
-	 * for create the next voucher
-	 *
-	 * @param array data Same to data in Afip.createVoucher except that
-	 * 	don't need CbteDesde and CbteHasta attributes
-	 *
-	 * @return array [CAE : CAE assigned to voucher, CAEFchVto : Expiration
-	 * 	date for CAE (yyyy-mm-dd), voucherNumber : Number assigned to
-	 * 	voucher]
-	 **/
-	//CreateNextVoucher(data *Voucher) error
-
-	/**
 	 * Get complete voucher information
 	 *
 	 * Asks to AFIP servers for complete information of voucher {@see WS
@@ -74,16 +59,6 @@ type electronicBilling interface {
 	 * 	{@see WS Specification item 4.19} or null if there not exists
 	 **/
 	GetVoucherInfo(voucherNumber, voucherPos int, voucherType voucher.VoucherType) (*voucher.GetVoucherInfoResponse, error)
-
-	/**
-	 * Create CAEA (Código de Autorización Electrónico Anticipado)
-	 *
-	 * Send a request to AFIP servers  to create a CAEA
-	 *
-	 * @param int period 	Time period
-	 * @param periodFrequency period frequency
-	 **/
-	//CreateCAEA(period int, periodFrequency CaeaPeriodFrequency) error
 
 	/**
 	 * Asks to AFIP Servers for sales points availables {@see WS
@@ -200,14 +175,12 @@ func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.Create
 
 		CompradorIvaExento: data.CompradorIvaExento,
 		PagoContado:        data.PagoContado,
-		GeneratePDF:        data.GeneratePDF,
 
 		MonId:    data.MonId,
 		MonCotiz: data.MonCotiz,
 
-		Phone:   data.Phone,
-		Email:   data.Email,
-		Website: data.Website,
+		Phone: data.Phone,
+		Email: data.Email,
 	}
 
 	/*
@@ -278,7 +251,13 @@ func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.Create
 	return nil
 }
 
-func (e *eBilling) CreatePDF(data interface{}) error {
+func (e *eBilling) CreatePDF(data voucher.VoucherPDF, folderName, fileName string) error {
+	err := e.afip.HttpClient.PostWithFileOnResponse(endpoints.GET_PDF, data, folderName, fileName)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -7,6 +7,7 @@ const (
 
 	AUTH    = "/auth"
 	GET_QR  = "/get-qr"
+	GET_PDF = "/pdf-invoice"
 	INVOICE = "/invoice"
 
 	TAXES           = "/taxes"

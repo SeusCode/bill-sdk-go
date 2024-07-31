@@ -139,10 +139,10 @@ type electronicBilling interface {
 }
 
 type eBilling struct {
-	afip *afipData
+	afip *AfipData
 }
 
-func newElectronicBilling(afip *afipData) electronicBilling {
+func newElectronicBilling(afip *AfipData) electronicBilling {
 	return &eBilling{
 		afip: afip,
 	}

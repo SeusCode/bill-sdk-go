@@ -21,10 +21,10 @@ type citizenRegistry interface {
 }
 
 type cRegistry struct {
-	afip *afipData
+	afip *AfipData
 }
 
-func newCitizenRegistry(afip *afipData) citizenRegistry {
+func newCitizenRegistry(afip *AfipData) citizenRegistry {
 	return &cRegistry{
 		afip: afip,
 	}

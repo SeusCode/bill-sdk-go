@@ -16,7 +16,7 @@ import (
 )
 
 type (
-	afipData struct {
+	AfipData struct {
 		// Certificate
 		certificate []byte
 
@@ -110,12 +110,12 @@ type (
 	}
 )
 
-func NewAfipManager(opts AfipOptions) (*afipData, error) {
+func NewAfipManager(opts AfipOptions) (*AfipData, error) {
 	if opts.TaxId == 0 || (opts.Enviroment != api.TESTING && opts.Enviroment != api.PRODUCTION) {
 		return nil, errors.New("missing a required option")
 	}
 
-	afipManager := &afipData{
+	afipManager := &AfipData{
 		certificate: opts.Certificate,
 		privateKey:  opts.PrivateKey,
 
@@ -140,7 +140,7 @@ func NewAfipManager(opts AfipOptions) (*afipData, error) {
 	return afipManager, nil
 }
 
-func (g *afipData) GetAuthToken() error {
+func (g *AfipData) GetAuthToken() error {
 	r := auth.AuthRequest{
 		Pos:          g.PointOfSale,
 		TaxId:        g.TaxId,
@@ -184,7 +184,7 @@ func (g *afipData) GetAuthToken() error {
 	return nil
 }
 
-func (g *afipData) ServerPing() (*PingResponse, error) {
+func (g *AfipData) ServerPing() (*PingResponse, error) {
 	var res PingResponse
 
 	apiResponse, err := g.HttpClient.Get(endpoints.PING, &res)
@@ -199,7 +199,7 @@ func (g *afipData) ServerPing() (*PingResponse, error) {
 	return &res, nil
 }
 
-func (g *afipData) AfipServerStatus() (*ServerStatusResponse, error) {
+func (g *AfipData) AfipServerStatus() (*ServerStatusResponse, error) {
 	var res ServerStatusResponse
 
 	apiResponse, err := g.HttpClient.Get(endpoints.AFIP_STATUS, &res)
@@ -214,7 +214,7 @@ func (g *afipData) AfipServerStatus() (*ServerStatusResponse, error) {
 	return &res, nil
 }
 
-func (g *afipData) SessionAlive() error {
+func (g *AfipData) SessionAlive() error {
 	var res interface{}
 
 	apiResponse, err := g.HttpClient.Get(endpoints.SESSION_ALIVE, &res)
@@ -229,7 +229,7 @@ func (g *afipData) SessionAlive() error {
 	return nil
 }
 
-func (g *afipData) startTokenRenewal() {
+func (g *AfipData) startTokenRenewal() {
 	ticker := time.NewTicker(1 * time.Hour)
 	defer ticker.Stop()
 

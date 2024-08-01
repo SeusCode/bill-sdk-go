@@ -52,7 +52,7 @@ func main() {
 		panic(fmt.Errorf("error happend on GetAuthToken %w", err))
 	}
 
-	err = afip.EBilling.CreatePDF(voucher.VoucherPDF{
+	filePath, err := afip.EBilling.CreatePDF(voucher.VoucherPDF{
 		Logo:      "none",
 		Watermark: "none",
 		Template:  voucher.Clasico,
@@ -96,10 +96,6 @@ func main() {
 			{BaseImp: 10, Id: 5, Total: 2.1},
 			{BaseImp: 33.7, Id: 4, Total: 12.1},
 		},
-
-		FchServDesde: "20240715",
-		FchServHasta: "20240715",
-		FchVtoPago:   "20240731",
 
 		Items: []voucher.VoucherItems{
 			{
@@ -148,9 +144,11 @@ func main() {
 				Percentage: 100,
 			},
 		},
-	}, "examples/generate-pdf/invoice/user_123123", "test_invoice.pdf")
+	}, "examples/generate-pdf/invoice", "test_invoice.pdf")
 
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println(filePath)
 }

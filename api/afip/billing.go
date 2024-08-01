@@ -25,7 +25,7 @@ type electronicBilling interface {
 	 *
 	 * @param {object} data Data for PDF creation
 	**/
-	CreatePDF(data voucher.VoucherPDF, folderName, fileName string) error
+	CreatePDF(data voucher.VoucherPDF, folderName, fileName string) (string, error)
 
 	/*
 	 Create a voucher from AFIP
@@ -251,14 +251,9 @@ func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.Create
 	return nil
 }
 
-func (e *eBilling) CreatePDF(data voucher.VoucherPDF, folderName, fileName string) error {
-	err := e.afip.HttpClient.PostWithFileOnResponse(endpoints.GET_PDF, data, folderName, fileName)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (e *eBilling) CreatePDF(data voucher.VoucherPDF, folderName, fileName string) (string, error) {
+	fPath, err := e.afip.HttpClient.PostWithFileOnResponse(endpoints.GET_PDF, data, folderName, fileName)
+	return fPath, err
 }
 
 func (e *eBilling) GetVoucherInfo(voucherNumber, voucherPos int, voucherType voucher.VoucherType) (*voucher.GetVoucherInfoResponse, error) {

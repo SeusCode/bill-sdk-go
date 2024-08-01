@@ -143,9 +143,9 @@ type (
 
 		Items []VoucherItems `json:"Items"`
 
-		FchServDesde string `json:"FchServDesde"`
-		FchServHasta string `json:"FchServHasta"`
-		FchVtoPago   string `json:"FchVtoPago"`
+		FchServDesde int `json:"FchServDesde"`
+		FchServHasta int `json:"FchServHasta"`
+		FchVtoPago   int `json:"FchVtoPago"`
 	}
 )
 

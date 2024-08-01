@@ -4,7 +4,7 @@ import "github.com/seuscode/bill-sdk-go/models/afip/document"
 
 type (
 	AFIPInformation struct {
-		VoucherDate  string                `json:"CbteFch"`
+		VoucherDate  int                   `json:"CbteFch"`
 		VoucherType  VoucherType           `json:"CbteTipo"`
 		Concept      VoucherConcept        `json:"Concepto"`
 		Document     int64                 `json:"DocNro"`

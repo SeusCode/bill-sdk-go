@@ -17,7 +17,7 @@ type citizenRegistry interface {
 	 *
 	 * @return array with information of the target
 	 **/
-	GetPersonInformation(registryNumber int, document int64, documentType document.DocumentType) (*citizen.GetPersonInformationResponse, error)
+	GetPersonInformation(registryNumber int, document string, documentType document.DocumentType) (*citizen.GetPersonInformationResponse, error)
 }
 
 type cRegistry struct {
@@ -36,7 +36,7 @@ func newCitizenRegistry(afip *AfipData) citizenRegistry {
 	-=============================-
 */
 
-func (c *cRegistry) GetPersonInformation(registryNumber int, citizenDocument int64, documentType document.DocumentType) (*citizen.GetPersonInformationResponse, error) {
+func (c *cRegistry) GetPersonInformation(registryNumber int, citizenDocument string, documentType document.DocumentType) (*citizen.GetPersonInformationResponse, error) {
 	var resp citizen.GetPersonInformationResponse
 
 	if documentType != document.CUIT && documentType != document.DNI {
@@ -49,7 +49,7 @@ func (c *cRegistry) GetPersonInformation(registryNumber int, citizenDocument int
 	}
 
 	if documentType == document.DNI {
-		r.TaxId = 0
+		r.TaxId = "0"
 		r.CitizenId = citizenDocument
 	}
 

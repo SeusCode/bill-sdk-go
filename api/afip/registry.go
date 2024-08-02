@@ -39,7 +39,7 @@ func newCitizenRegistry(afip *AfipData) citizenRegistry {
 func (c *cRegistry) GetPersonInformation(registryNumber int, citizenDocument string, documentType document.DocumentType) (*citizen.GetPersonInformationResponse, error) {
 	var resp citizen.GetPersonInformationResponse
 
-	if documentType != document.CUIT && documentType != document.DNI {
+	if documentType != document.CUIT && documentType != document.DNI && documentType != document.CUIL {
 		return nil, errors.New("document type not allowed")
 	}
 

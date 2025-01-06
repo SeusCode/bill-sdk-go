@@ -1,13 +1,10 @@
 package endpoints
 
 const (
-	PING          = "/ping"
-	AFIP_STATUS   = "/afipstatus"
-	SESSION_ALIVE = "/session-alive"
+	PING        = "/ping"
+	AFIP_STATUS = "/status"
 
-	AUTH    = "/auth"
-	GET_QR  = "/get-qr"
-	GET_PDF = "/pdf-invoice"
+	GET_PDF = "/invoice/pdf"
 	INVOICE = "/invoice"
 
 	TAXES           = "/taxes"
@@ -17,9 +14,9 @@ const (
 	OPTIONALS       = "/optionals"
 	DOCUMENTS       = "/documents"
 	CURRENCIES      = "/currencies"
-	COTIZATIONS     = "/getcotiz"
-	SALES_POINTS    = "/sales-points"
-	PAYMENT_METHODS = "/payments"
+	COTIZATIONS     = "/quotation"
+	SALES_POINTS    = "/pos"
+	PAYMENT_METHODS = "/payment/methods"
 
-	CITIZEN_DATA = "/getpersoninfo"
+	CITIZEN_DATA = "/p{padronId}/citizen"
 )

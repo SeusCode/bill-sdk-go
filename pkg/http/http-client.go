@@ -110,6 +110,10 @@ func (c *HttpClient) Get(endpoint string, expectedResponse interface{}) (*ApiRes
 		return nil, fmt.Errorf("%w: %s", err, string(bodyBytes))
 	}
 
+	bodyBytes, _ := io.ReadAll(resp.Body)
+	fmt.Println("received info")
+	fmt.Println(string(bodyBytes))
+
 	apiResponse, err := c.bodyParser(resp, expectedResponse)
 	if err != nil {
 		return nil, err

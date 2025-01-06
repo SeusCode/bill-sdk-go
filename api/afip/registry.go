@@ -3,6 +3,7 @@ package afip
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/seuscode/bill-sdk-go/models/afip/citizen"
 	"github.com/seuscode/bill-sdk-go/models/afip/document"
@@ -43,17 +44,16 @@ func (c *cRegistry) GetPersonInformation(registryNumber int, citizenDocument str
 		return nil, errors.New("document type not allowed")
 	}
 
-	r := citizen.GetPersonInformationRequest{
-		RegistryNumber: registryNumber,
-		TaxId:          citizenDocument,
+	endpoint := citizenDocument
+	if registryNumber == 13 {
+		if documentType == document.DNI {
+			endpoint = fmt.Sprintf("%s/%s", "dni", citizenDocument)
+		} else {
+			endpoint = fmt.Sprintf("%s/%s", "cuit", citizenDocument)
+		}
 	}
 
-	if documentType == document.DNI {
-		r.TaxId = "0"
-		r.CitizenId = citizenDocument
-	}
-
-	apiData, err := c.afip.HttpClient.Post(endpoints.CITIZEN_DATA, r, &resp)
+	apiData, err := c.afip.HttpClient.Get(fmt.Sprintf("%s/%s", strings.ReplaceAll(endpoints.CITIZEN_DATA, "{padronId}", fmt.Sprintf("%d", registryNumber)), endpoint), &resp)
 	if err != nil {
 		return nil, err
 	}

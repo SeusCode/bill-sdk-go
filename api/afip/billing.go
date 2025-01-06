@@ -25,7 +25,7 @@ type electronicBilling interface {
 	 *
 	 * @param {object} data Data for PDF creation
 	**/
-	CreatePDF(data voucher.VoucherPDF, folderName, fileName string) (string, error)
+	CreatePDF(data voucher.CreateVoucherPDFRequest, folderName, fileName string) (string, error)
 
 	/*
 	 Create a voucher from AFIP
@@ -74,7 +74,7 @@ type electronicBilling interface {
 	 *
 	 * @return array All voucher types availables
 	 **/
-	GetVoucherTypes(onlySystemAvailable bool) (*voucher.GetVoucherTypesResponse, error)
+	GetVoucherTypes() (*voucher.GetVoucherTypesResponse, error)
 
 	/**
 	 * Asks to AFIP Servers for voucher concepts availables {@see WS
@@ -156,8 +156,6 @@ func newElectronicBilling(afip *AfipData) electronicBilling {
 
 func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.CreateVoucherResponse) error {
 	r := voucher.CreateVoucherRequest{
-		PtoVta: e.afip.PointOfSale,
-
 		CbteTipo: data.CbteTipo,
 		Concepto: data.Concepto,
 
@@ -168,19 +166,15 @@ func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.Create
 		Items:   data.Items,
 
 		CbtesAsoc:   data.CbtesAsoc,
-		Iva:         data.Iva,
 		Tributos:    data.Tributos,
 		Opcionales:  data.Opcionales,
 		Compradores: data.Compradores,
 
 		CompradorIvaExento: data.CompradorIvaExento,
-		PagoContado:        data.PagoContado,
+		MetodoPago:         data.MetodoDePago,
 
 		MonId:    data.MonId,
 		MonCotiz: data.MonCotiz,
-
-		Phone: data.Phone,
-		Email: data.Email,
 	}
 
 	/*
@@ -220,10 +214,6 @@ func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.Create
 		r.CompradorIvaExento = &f
 	}
 
-	if r.PagoContado == nil {
-		r.PagoContado = &f
-	}
-
 	if r.GeneratePDF == nil {
 		r.GeneratePDF = &f
 	}
@@ -251,7 +241,7 @@ func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.Create
 	return nil
 }
 
-func (e *eBilling) CreatePDF(data voucher.VoucherPDF, folderName, fileName string) (string, error) {
+func (e *eBilling) CreatePDF(data voucher.CreateVoucherPDFRequest, folderName, fileName string) (string, error) {
 	fPath, err := e.afip.HttpClient.PostWithFileOnResponse(endpoints.GET_PDF, data, folderName, fileName)
 	return fPath, err
 }
@@ -286,15 +276,10 @@ func (e *eBilling) GetSalesPoints() (*pos.GetPointsOfSaleResponse, error) {
 	return &res, nil
 }
 
-func (e *eBilling) GetVoucherTypes(onlySystemAvailable bool) (*voucher.GetVoucherTypesResponse, error) {
+func (e *eBilling) GetVoucherTypes() (*voucher.GetVoucherTypesResponse, error) {
 	var res voucher.GetVoucherTypesResponse
 
-	apiEndpoint := endpoints.VOUCHERS
-	if onlySystemAvailable {
-		apiEndpoint += "/SystemValids"
-	}
-
-	apiResponse, err := e.afip.HttpClient.Get(apiEndpoint, &res)
+	apiResponse, err := e.afip.HttpClient.Get(endpoints.VOUCHERS, &res)
 	if err != nil {
 		return nil, err
 	}

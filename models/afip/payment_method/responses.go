@@ -1,5 +1,5 @@
 package payment_method
 
 type GetPaymentMethodsResponse struct {
-	PaymentMethods []PaymentMethod `json:"payments_types"`
+	PaymentMethods []PaymentMethod `json:"payment_methods"`
 }

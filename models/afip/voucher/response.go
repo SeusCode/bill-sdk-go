@@ -4,21 +4,29 @@ import "github.com/seuscode/bill-sdk-go/models/afip/document"
 
 type (
 	AFIPInformation struct {
-		VoucherDate  int                   `json:"CbteFch"`
-		VoucherType  VoucherType           `json:"CbteTipo"`
-		Concept      VoucherConcept        `json:"Concepto"`
-		Document     int64                 `json:"DocNro"`
-		DocumentType document.DocumentType `json:"DocTipo"`
-		ImpIVA       float64               `json:"ImpIVA"`
-		ImpNeto      float64               `json:"ImpNeto"`
-		ImpOpEx      float64               `json:"ImpOpEx"`
-		ImpTotal     float64               `json:"ImpTotal"`
-		ImpTotConc   float64               `json:"ImpTotConc"`
-		ImpTrib      float64               `json:"ImpTrib"`
-		MonCotiz     float64               `json:"MonCotiz"`
-		MonId        string                `json:"MonId"`
-		PointOfSale  int                   `json:"PtoVta"`
-		Iva          []VoucherShare        `json:"Iva"`
+		VoucherDate  string              `json:"CbteFch"`
+		VoucherType  int32               `json:"CbteTipo"`
+		Concept      int32               `json:"Concepto"`
+		Document     int64               `json:"DocNro"`
+		DocumentType int32               `json:"DocTipo"`
+		ImpIVA       float64             `json:"ImpIVA"`
+		ImpNeto      float64             `json:"ImpNeto"`
+		ImpOpEx      float64             `json:"ImpOpEx"`
+		ImpTotal     float64             `json:"ImpTotal"`
+		ImpTotConc   float64             `json:"ImpTotConc"`
+		ImpTrib      float64             `json:"ImpTrib"`
+		MonCotiz     float64             `json:"MonCotiz"`
+		MonId        string              `json:"MonId"`
+		PointOfSale  int32               `json:"PtoVta"`
+		FchServDesde string              `json:"FchServDesde,omitempty"`
+		FchServHasta string              `json:"FchServHasta,omitempty"`
+		FchVtoPago   string              `json:"FchVtoPago,omitempty"`
+		Iva          []VoucherShare      `json:"Iva,omitempty"`
+		Items        []VoucherItems      `json:"Items"`
+		CbtesAsoc    []AsociatedVouchers `json:"CbtesAsoc,omitempty"`
+		Tributos     []VoucherTributes   `json:"Tributos,omitempty"`
+		Opcionales   []VoucherOptionals  `json:"Opcionales,omitempty"`
+		Compradores  []VoucherBuyers     `json:"Compradores,omitempty"`
 	}
 
 	AFIPVoucherIva struct {

@@ -2,10 +2,10 @@ package currency
 
 type (
 	GetCurrencyTypesResponse struct {
-		Currencies []Currency `json:"currencies_types"`
+		Currencies []Currency `json:"currency_types"`
 	}
 
 	GetCurrencyCotizationResponse struct {
-		CotizationData Cotization `json:"monCotiz"`
+		CotizationData Cotization `json:"currency_quotation"`
 	}
 )

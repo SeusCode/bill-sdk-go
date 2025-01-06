@@ -35,19 +35,16 @@ type (
 		Items []VoucherItems `json:"Items"`
 
 		CbtesAsoc   []AsociatedVouchers `json:"CbtesAsoc,omitempty"`
-		Iva         []VoucherShare      `json:"Iva,omitempty"`
 		Tributos    []VoucherTributes   `json:"Tributos,omitempty"`
 		Opcionales  []VoucherOptionals  `json:"Opcionales,omitempty"`
 		Compradores []VoucherBuyers     `json:"Compradores,omitempty"`
 
-		CompradorIvaExento *bool `json:"CompradorIvaExento,omitempty"`
-		PagoContado        *bool `json:"pagoContado,omitempty"`
+		MetodoDePago       payment_method.SellConditionId `json:"metodoPago,omitempty"`
+		CompradorIvaExento *bool                          `json:"CompradorIvaExento,omitempty"`
+		UniqueItems        *bool                          `json:"UniqueItems,omitempty"`
 
 		MonId    *string  `json:"MonId,omitempty"`
 		MonCotiz *float64 `json:"MonCotiz,omitempty"`
-
-		Phone *string `json:"tel,omitempty"`
-		Email *string `json:"email,omitempty"`
 	}
 
 	VoucherItems struct {

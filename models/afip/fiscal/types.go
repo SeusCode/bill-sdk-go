@@ -1,17 +1,16 @@
 package fiscal
 
 type (
-	FiscalType string
+	FiscalType uint
 )
 
 const (
 	// Fiscal Types
-	IVA_EXENTO                   FiscalType = "IVA Exento"
-	IVA_RESPONSABLE_INSCRIPTO    FiscalType = "IVA Responsable Inscripto"
-	IVA_RESPONSABLE_NO_INSCRIPTO FiscalType = "IVA Responsable No Inscripto"
-
-	MONOTRIBUTO            FiscalType = "Responsable Monotributo"
-	NO_CATEGORIZADO        FiscalType = "Sujeto No Categorizado"
-	CONSUMIDOR_FINAL       FiscalType = "Consumidor Final"
-	PROVEEDOR_DEL_EXTERIOR FiscalType = "Proveedor del Exterior"
+	MONOTRIBUTO                  FiscalType = 1
+	NO_CATEGORIZADO              FiscalType = 2
+	CONSUMIDOR_FINAL             FiscalType = 3
+	PROVEEDOR_DEL_EXTERIOR       FiscalType = 4
+	IVA_EXENTO                   FiscalType = 5
+	IVA_RESPONSABLE_INSCRIPTO    FiscalType = 6
+	IVA_RESPONSABLE_NO_INSCRIPTO FiscalType = 7
 )

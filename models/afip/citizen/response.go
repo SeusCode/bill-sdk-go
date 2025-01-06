@@ -26,14 +26,18 @@ type (
 		Addresses []*PersonAddress
 	}
 
+	// Tipo personalizado para fechas
+	FlexibleDate string
+
+	// Estructura de respuesta
 	GetPersonInformationResponse struct {
 		Surname                 *string         `json:"apellido,omitempty"`
 		DescriptionMainActivity *string         `json:"descripcionActividadPrincipal,omitempty"`
 		Address                 FlexibleAddress `json:"domicilio,omitempty"`
 		StateKey                *string         `json:"estadoClave,omitempty"`
-		BirthDate               *string         `json:"fechaNacimiento,omitempty"`
-		SocialContractDate      *string         `json:"fechaContratoSocial,omitempty"`
-		DateOfDeath             *string         `json:"fechaFallecimiento,omitempty"`
+		BirthDate               FlexibleDate    `json:"fechaNacimiento,omitempty"`
+		SocialContractDate      FlexibleDate    `json:"fechaContratoSocial,omitempty"`
+		DateOfDeath             FlexibleDate    `json:"fechaFallecimiento,omitempty"`
 		LegalForm               *string         `json:"formaJuridica,omitempty"`
 		MainActivityID          *int            `json:"idActividadPrincipal,omitempty"`
 		PersonID                int             `json:"idPersona"`
@@ -63,4 +67,17 @@ func (fa *FlexibleAddress) UnmarshalJSON(data []byte) error {
 	}
 
 	return fmt.Errorf("data does not match expected structure for domicilio")
+}
+
+func (fd *FlexibleDate) UnmarshalJSON(data []byte) error {
+	if string(data) == "{}" || string(data) == "null" {
+		*fd = ""
+		return nil
+	}
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return err
+	}
+	*fd = FlexibleDate(str)
+	return nil
 }

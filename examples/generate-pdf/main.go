@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/seuscode/bill-sdk-go/api/afip"
 	"github.com/seuscode/bill-sdk-go/models/afip/aliquot"
-	"github.com/seuscode/bill-sdk-go/models/afip/document"
 	"github.com/seuscode/bill-sdk-go/models/afip/fiscal"
 	"github.com/seuscode/bill-sdk-go/models/afip/payment_method"
 	"github.com/seuscode/bill-sdk-go/models/afip/voucher"
@@ -14,136 +12,71 @@ import (
 )
 
 func main() {
-	/*
-	 To execute this test you have to replace the following path
-	 for a path to your certificate and private key or create the
-	 certs folder in the root of this project and put them inside.
-	*/
-	certificate, err := os.ReadFile("./certs/web.crt")
-	if err != nil {
-		panic(fmt.Errorf("could not read the certificate %w", err))
-	}
-
-	privateKey, err := os.ReadFile("./certs/web.key")
-	if err != nil {
-		panic(fmt.Errorf("could not read the private key %w", err))
-	}
-
 	afip, err := afip.NewAfipManager(afip.AfipOptions{
-		Certificate: certificate,
-		PrivateKey:  privateKey,
-
-		// Replace this information with yours
-		TaxId:           20123456780,
-		BusinessName:    "YOUR BUSINESS NAME",
-		FiscalAddress:   "YOUR FISCAL ADDRESS",
-		FiscalType:      fiscal.IVA_RESPONSABLE_INSCRIPTO,
-		StartOfActivity: "YOUR START OF ACTIVITY DATE", // (dd/mm/yyyy)
-		PointOfSale:     1,
-		Enviroment:      api.PRODUCTION,
+		ApiKey:     "633C3509DC2513BB9E5C414AB542444D6A33F2478C188F4BBB58",
+		Enviroment: api.PRODUCTION,
 	})
 
 	if err != nil {
 		panic(err)
 	}
 
-	err = afip.GetAuthToken()
-	if err != nil {
-		panic(fmt.Errorf("error happend on GetAuthToken %w", err))
-	}
-
-	filePath, err := afip.EBilling.CreatePDF(voucher.VoucherPDF{
-		Logo:      "none",
-		Watermark: "none",
-		Template:  voucher.Clasico,
-		PtoVta:    7,
-
-		CbteTipo: voucher.FacturaA,
-		CbteNro:  1233,
-		CbteFch:  20240730,
-		Concepto: voucher.Productos,
-
-		CopiaDesde: 0,
-		CopiaHasta: 0,
-
-		DocTipo: document.CUIT,
-		DocNro:  20111111112,
-
-		MonId:    "PES",
-		MonCotiz: 1,
-
-		CAE:       "6621462155158814",
-		CAEFchVto: "20240731",
-
-		Cliente: voucher.VoucherClient{
-			Phone:              "39843798543",
-			Address:            "Calle 455",
-			Email:              "jdoe@test.com",
-			SellCondition:      payment_method.Cash,
-			FiscalType:         fiscal.CONSUMIDOR_FINAL,
-			NameOrBusinessName: "John Doe",
-		},
-
-		ImpIVA:     2.1,
-		ImpNeto:    10,
-		ImpOpEx:    0,
-		ImpTotConc: 0,
-		ImpTotal:   12.1,
-		ImpTrib:    13.1,
-
-		Iva: []voucher.VoucherShare{
-			{BaseImp: 10, Id: 5, Total: 2.1},
-			{BaseImp: 10, Id: 5, Total: 2.1},
-			{BaseImp: 33.7, Id: 4, Total: 12.1},
-		},
-
-		Items: []voucher.VoucherItems{
-			{
-				Id:             "1",
-				Qty:            120,
-				Price:          1500,
-				Discount:       0,
-				Desc:           "Producto 1",
-				Subtotal:       180000,
-				Iva:            aliquot.TwentyOnePercent,
-				IvaExento:      false,
-				NoGravadodeIVA: false,
+	filePath, err := afip.EBilling.CreatePDF(voucher.CreateVoucherPDFRequest{
+		CAE:        "75010562627746",
+		CAEFchVto:  "20250115",
+		QREndpoint: "https://www.afip.gob.ar/fe/qr/?p=eyJjb2RBdXQiOjc1MDEwNTYyNjI3NzQ2LCJjdHoiOjEsImN1aXQiOjIwMjg5NjgzODEwLCJmZWNoYSI6IjIwMjUtMDEtMDUiLCJpbXBvcnRlIjoxOTEuOTIsIm1vbmVkYSI6IlBFUyIsIm5yb0NtcCI6MjIxMywibnJvRG9",
+		AfipInformation: voucher.AFIPInformation{
+			VoucherDate:  "20250105",
+			VoucherType:  6,
+			Concept:      1,
+			Document:     0,
+			DocumentType: 99,
+			ImpIVA:       18.24,
+			ImpNeto:      173.68,
+			ImpOpEx:      0,
+			ImpTotal:     191.92,
+			ImpTotConc:   0,
+			ImpTrib:      0,
+			MonCotiz:     1,
+			MonId:        "PES",
+			PointOfSale:  7,
+			Iva: []voucher.VoucherShare{{
+				Id:      4,
+				BaseImp: 173.68,
+				Total:   18.24,
+			}},
+			Items: []voucher.VoucherItems{
+				{
+					Id:             "124",
+					Qty:            4.3,
+					Iva:            aliquot.TenDotFivePercent,
+					Price:          50,
+					Desc:           "Vacio",
+					Discount:       0,
+					Subtotal:       215,
+					IvaExento:      false,
+					NoGravadodeIVA: false,
+				},
+				{
+					Id:             "0001",
+					Qty:            1,
+					Iva:            aliquot.TenDotFivePercent,
+					Price:          -41.32,
+					Desc:           "Descuento",
+					Discount:       0,
+					Subtotal:       -41.32,
+					IvaExento:      false,
+					NoGravadodeIVA: false,
+				},
 			},
 		},
-
-		CbtesAsoc: []voucher.AsociatedVouchers{
-			{
-				Type:  6,
-				Pos:   1,
-				Nbr:   1,
-				TaxId: 20111111112,
-			},
-		},
-
-		Tributos: []voucher.VoucherTributes{
-			{
-				Id:      99,
-				Desc:    "Ingresos Brutos",
-				BaseImp: 150,
-				Alic:    5.2,
-				Total:   7.8,
-			},
-		},
-
-		Opcionales: []voucher.VoucherOptionals{
-			{
-				Id:    17,
-				Value: 2,
-			},
-		},
-
-		Compradores: []voucher.VoucherBuyers{
-			{
-				DocType:    80,
-				DocNro:     20111111112,
-				Percentage: 100,
-			},
-		},
+		VoucherNbr:               2213,
+		MetodoPago:               payment_method.Cash,
+		ClientFiscalType:         uint(fiscal.CONSUMIDOR_FINAL),
+		ClientPhone:              "+543364123456",
+		ClientEmail:              "usuario@gmail.com",
+		ClientAddress:            "Alguna calle 235",
+		ClientNameOrBusinessName: "algun nombre",
 	}, "examples/generate-pdf/invoice", "test_invoice.pdf")
 
 	if err != nil {

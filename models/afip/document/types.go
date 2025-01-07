@@ -1,7 +1,7 @@
 package document
 
 type (
-	DocumentType uint
+	DocumentType int32
 
 	Document struct {
 		Id        DocumentType `json:"Id"`

@@ -3,14 +3,12 @@ package voucher
 import (
 	"github.com/seuscode/bill-sdk-go/models/afip/aliquot"
 	"github.com/seuscode/bill-sdk-go/models/afip/document"
-	"github.com/seuscode/bill-sdk-go/models/afip/fiscal"
 	"github.com/seuscode/bill-sdk-go/models/afip/payment_method"
 )
 
 type (
-	VoucherType        uint
-	VoucherConcept     uint
-	VoucherPDFTemplate string
+	VoucherType    int32
+	VoucherConcept int32
 
 	Type struct {
 		Id        VoucherType `json:"Id"`
@@ -90,60 +88,6 @@ type (
 		Nbr   int         `json:"Nro"`
 		TaxId int         `json:"Cuit"`
 	}
-
-	VoucherClient struct {
-		Phone              string                         `json:"tel,omitempty"`
-		Email              string                         `json:"email,omitempty"`
-		Address            string                         `json:"domicilio"`
-		FiscalType         fiscal.FiscalType              `json:"condicionIva"`
-		SellCondition      payment_method.SellConditionId `json:"condicionDeVenta"`
-		NameOrBusinessName string                         `json:"razonSocial"`
-	}
-
-	VoucherPDF struct {
-		Logo      string             `json:"logo"`
-		Watermark string             `json:"watermark"`
-		Template  VoucherPDFTemplate `json:"template"`
-		PtoVta    int                `json:"PtoVta"`
-
-		CbteNro  int            `json:"CbteNum"`
-		CbteFch  int64          `json:"CbteFch"`
-		CbteTipo VoucherType    `json:"CbteTipo"`
-		Concepto VoucherConcept `json:"Concepto"`
-
-		CopiaDesde int `json:"fromCopy"`
-		CopiaHasta int `json:"toCopy"`
-
-		DocTipo document.DocumentType `json:"DocTipo"`
-		DocNro  int64                 `json:"DocNro"`
-
-		MonId    string  `json:"MonId"`
-		MonCotiz float64 `json:"MonCotiz"`
-
-		CAE       string `json:"CAE"`
-		CAEFchVto string `json:"CAEFchVto"`
-
-		Cliente VoucherClient `json:"Cliente"`
-
-		ImpIVA     float64 `json:"ImpIVA"`
-		ImpNeto    float64 `json:"ImpNeto"`
-		ImpOpEx    float64 `json:"ImpOpEx"`
-		ImpTrib    float64 `json:"ImpTrib"`
-		ImpTotal   float64 `json:"ImpTotal"`
-		ImpTotConc float64 `json:"ImpTotConc"`
-
-		Iva         []VoucherShare      `json:"Iva,omitempty"`
-		CbtesAsoc   []AsociatedVouchers `json:"CbtesAsoc,omitempty"`
-		Tributos    []VoucherTributes   `json:"Tributos,omitempty"`
-		Opcionales  []VoucherOptionals  `json:"Opcionales,omitempty"`
-		Compradores []VoucherBuyers     `json:"Compradores,omitempty"`
-
-		Items []VoucherItems `json:"Items"`
-
-		FchServDesde int `json:"FchServDesde"`
-		FchServHasta int `json:"FchServHasta"`
-		FchVtoPago   int `json:"FchVtoPago"`
-	}
 )
 
 const (
@@ -154,6 +98,4 @@ const (
 	Ambos     VoucherConcept = 3
 	Productos VoucherConcept = 1
 	Servicios VoucherConcept = 2
-
-	Clasico VoucherPDFTemplate = "classic"
 )

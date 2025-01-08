@@ -3,7 +3,6 @@ package voucher
 import (
 	"github.com/seuscode/bill-sdk-go/models/afip/aliquot"
 	"github.com/seuscode/bill-sdk-go/models/afip/document"
-	"github.com/seuscode/bill-sdk-go/models/afip/payment_method"
 )
 
 type (
@@ -18,31 +17,23 @@ type (
 	}
 
 	Voucher struct {
-		CbteTipo VoucherType    `json:"CbteTipo"`
-		Concepto VoucherConcept `json:"Concepto"`
-
-		DocTipo document.DocumentType `json:"DocTipo"`
-		DocNro  int64                 `json:"DocNro"`
-
-		CbteFch *string `json:"CbteFch,omitempty"`
-
-		FchServDesde *int `json:"FchServDesde,omitempty"`
-		FchServHasta *int `json:"FchServHasta,omitempty"`
-		FchVtoPago   *int `json:"FchVtoPago,omitempty"`
-
-		Items []VoucherItems `json:"Items"`
-
-		CbtesAsoc   []AsociatedVouchers `json:"CbtesAsoc,omitempty"`
-		Tributos    []VoucherTributes   `json:"Tributos,omitempty"`
-		Opcionales  []VoucherOptionals  `json:"Opcionales,omitempty"`
-		Compradores []VoucherBuyers     `json:"Compradores,omitempty"`
-
-		MetodoDePago       payment_method.SellConditionId `json:"metodoPago,omitempty"`
-		CompradorIvaExento *bool                          `json:"CompradorIvaExento,omitempty"`
-		UniqueItems        *bool                          `json:"UniqueItems,omitempty"`
-
-		MonId    *string  `json:"MonId,omitempty"`
-		MonCotiz *float64 `json:"MonCotiz,omitempty"`
+		CbteTipo           VoucherType           `json:"CbteTipo"`                     // Tipo de Comprobante
+		Concepto           VoucherConcept        `json:"Concepto"`                     // Concepto del Comprobante
+		DocTipo            document.DocumentType `json:"DocTipo"`                      // Tipo de Documento del Receptor
+		DocNro             int64                 `json:"DocNro"`                       // Número de Documento del Receptor
+		CbteFch            *string               `json:"CbteFch,omitempty"`            // Fecha del Comprobante (opcional: puede ser actual si no se envía)
+		MonId              *string               `json:"MonId,omitempty"`              // Moneda (por defecto "PES")
+		MonCotiz           *float64              `json:"MonCotiz,omitempty"`           // Cotización de la Moneda (por defecto 1)
+		FchServDesde       *string               `json:"FchServDesde,omitempty"`       // Fecha de Inicio del Servicio (requerido para Concepto 2 o 3)
+		FchServHasta       *string               `json:"FchServHasta,omitempty"`       // Fecha de Fin del Servicio (requerido para Concepto 2 o 3)
+		FchVtoPago         *string               `json:"FchVtoPago,omitempty"`         // Fecha de Vencimiento del Pago (requerido para Concepto 2 o 3)
+		Items              []VoucherItems        `json:"Items"`                        // Detalle de los ítems del comprobante
+		CbtesAsoc          []AsociatedVouchers   `json:"CbtesAsoc,omitempty"`          // Comprobantes Asociados (opcional)
+		Tributos           []VoucherTributes     `json:"Tributos,omitempty"`           // Tributos (opcional)
+		Opcionales         []VoucherOptionals    `json:"Opcionales,omitempty"`         // Opcionales (opcional)
+		Compradores        []VoucherBuyers       `json:"Compradores,omitempty"`        // Compradores adicionales (opcional)
+		CompradorIvaExento *bool                 `json:"CompradorIvaExento,omitempty"` // Indica si el comprador es IVA exento (opcional)
+		UniqueItems        *bool                 `json:"UniqueItems,omitempty"`        // Indica si los ítems son únicos (opcional)
 	}
 
 	VoucherItems struct {

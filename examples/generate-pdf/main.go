@@ -13,7 +13,7 @@ import (
 
 func main() {
 	afip, err := afip.NewAfipManager(afip.AfipOptions{
-		ApiKey:     "633C3509DC2513BB9E5C414AB542444D6A33F2478C188F4BBB58",
+		ApiKey:     "YOUR_API_KEY",
 		Enviroment: api.PRODUCTION,
 	})
 
@@ -27,7 +27,7 @@ func main() {
 		QREndpoint: "https://www.afip.gob.ar/fe/qr/?p=eyJjb2RBdXQiOjc1MDEwNTYyNjI3NzQ2LCJjdHoiOjEsImN1aXQiOjIwMjg5NjgzODEwLCJmZWNoYSI6IjIwMjUtMDEtMDUiLCJpbXBvcnRlIjoxOTEuOTIsIm1vbmVkYSI6IlBFUyIsIm5yb0NtcCI6MjIxMywibnJvRG9",
 		AfipInformation: voucher.AFIPInformation{
 			VoucherDate:  "20250105",
-			VoucherType:  6,
+			VoucherType:  1,
 			Concept:      1,
 			Document:     0,
 			DocumentType: 99,

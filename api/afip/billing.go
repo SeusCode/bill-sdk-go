@@ -171,7 +171,6 @@ func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.Create
 		Compradores: data.Compradores,
 
 		CompradorIvaExento: data.CompradorIvaExento,
-		MetodoPago:         data.MetodoDePago,
 
 		MonId:    data.MonId,
 		MonCotiz: data.MonCotiz,
@@ -214,19 +213,8 @@ func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.Create
 		r.CompradorIvaExento = &f
 	}
 
-	if r.GeneratePDF == nil {
-		r.GeneratePDF = &f
-	}
-
 	if (r.MonId != nil && r.MonCotiz == nil) || (r.MonId == nil && r.MonCotiz != nil) {
 		return errors.New("if you send one of this fields (MonId or MonCotiz) you must send the other too")
-	}
-
-	if r.MonId == nil {
-		ars := "PES"
-		arsCot := 1.0
-		r.MonId = &ars
-		r.MonCotiz = &arsCot
 	}
 
 	apiStatus, err := e.afip.HttpClient.Post(endpoints.INVOICE, r, response)

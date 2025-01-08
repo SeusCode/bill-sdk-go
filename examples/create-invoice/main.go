@@ -6,14 +6,13 @@ import (
 	"github.com/seuscode/bill-sdk-go/api/afip"
 	"github.com/seuscode/bill-sdk-go/models/afip/aliquot"
 	"github.com/seuscode/bill-sdk-go/models/afip/document"
-	"github.com/seuscode/bill-sdk-go/models/afip/payment_method"
 	"github.com/seuscode/bill-sdk-go/models/afip/voucher"
 	"github.com/seuscode/bill-sdk-go/models/api"
 )
 
 func main() {
 	afip, err := afip.NewAfipManager(afip.AfipOptions{
-		ApiKey:     "633C3509DC2513BB9E5C414AB542444D6A33F2478C188F4BBB58",
+		ApiKey:     "YOUR_API_KEY",
 		Enviroment: api.PRODUCTION,
 	})
 
@@ -23,11 +22,10 @@ func main() {
 
 	var resp voucher.CreateVoucherResponse
 	err = afip.EBilling.CreateVoucher(&voucher.Voucher{
-		CbteTipo:     voucher.FacturaB,
-		Concepto:     voucher.Productos,
-		MetodoDePago: payment_method.Cash,
-		DocTipo:      document.CF,
-		DocNro:       0,
+		CbteTipo: voucher.FacturaB,
+		Concepto: voucher.Productos,
+		DocTipo:  document.CF,
+		DocNro:   0,
 
 		Items: []voucher.VoucherItems{
 			{

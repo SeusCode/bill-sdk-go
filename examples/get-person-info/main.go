@@ -12,7 +12,7 @@ import (
 
 func main() {
 	afip, err := afip.NewAfipManager(afip.AfipOptions{
-		ApiKey:     "633C3509DC2513BB9E5C414AB542444D6A33F2478C188F4BBB58",
+		ApiKey:     "YOUR_API_KEY",
 		Enviroment: api.PRODUCTION,
 	})
 
@@ -22,6 +22,7 @@ func main() {
 
 	personIDs := []string{
 		// Add here all the taxId of person you want to get the info
+		"45987987",
 	}
 
 	for _, personID := range personIDs {

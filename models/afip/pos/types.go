@@ -2,9 +2,9 @@ package pos
 
 type (
 	PointOfSale struct {
-		Id              int    `json:"Nro"`
-		Type            string `json:"EmisionTipo"`
-		Banned          string `json:"Bloqueado"`
-		TerminationDate string `json:"FchBaja"`
+		Nro         int32  `xml:"Nro,omitempty" json:"Nro,omitempty"`
+		EmisionTipo string `xml:"EmisionTipo,omitempty" json:"EmisionTipo,omitempty"`
+		Bloqueado   string `xml:"Bloqueado,omitempty" json:"Bloqueado,omitempty"`
+		FchBaja     string `xml:"FchBaja,omitempty" json:"FchBaja,omitempty"`
 	}
 )

@@ -1,11 +1,11 @@
 package currency
 
 type (
-	GetCurrencyTypesResponse struct {
-		Currencies []Currency `json:"currency_types"`
+	GetCurrenciesResponse struct {
+		Currencies []CurrencyDetails `json:"currencies"`
 	}
 
-	GetCurrencyCotizationResponse struct {
-		CotizationData Cotization `json:"currency_quotation"`
+	GetCurrencyExchangeRateResponse struct {
+		ExchangeRate CurrencyExchangeRate `json:"exchange_rate"`
 	}
 )

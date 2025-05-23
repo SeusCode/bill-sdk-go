@@ -1,5 +1,5 @@
 package pos
 
 type GetPointsOfSaleResponse struct {
-	POS []PointOfSale `json:"poins_of_sale"`
+	PointsOfSales []PointOfSale `json:"points_of_sales"`
 }

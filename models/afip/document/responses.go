@@ -1,5 +1,5 @@
 package document
 
-type GetDocumentTypesResponse struct {
-	Documents []Document `json:"document_types"`
+type GetDocumentsResponse struct {
+	Documents []DocumentDetails `json:"documents"`
 }

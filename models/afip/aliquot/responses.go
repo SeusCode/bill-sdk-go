@@ -1,7 +1,7 @@
 package aliquot
 
 type (
-	GetAliquotTypesResponse struct {
-		Aliquots []Aliquot `json:"aliquot_types"`
+	GetAliquotsResponse struct {
+		Aliquots []AliquotDetails `json:"aliquots"`
 	}
 )

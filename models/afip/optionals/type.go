@@ -1,10 +1,10 @@
 package optionals
 
 type (
-	OptionalType struct {
-		Id        string `json:"Id"`
-		Desc      string `json:"Desc"`
-		EndDate   string `json:"FchHasta"`
-		StartDate string `json:"FchDesde"`
+	OptionalDetails struct {
+		Id       string `xml:"Id,omitempty" json:"Id,omitempty"`
+		Desc     string `xml:"Desc,omitempty" json:"Desc,omitempty"`
+		FchDesde string `xml:"FchDesde,omitempty" json:"FchDesde,omitempty"`
+		FchHasta string `xml:"FchHasta,omitempty" json:"FchHasta,omitempty"`
 	}
 )

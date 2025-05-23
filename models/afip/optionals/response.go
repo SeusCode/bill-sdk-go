@@ -1,5 +1,5 @@
 package optionals
 
-type GetOptionalTypesResponse struct {
-	Optionals []OptionalType `json:"option_types"`
+type GetOptionalsResponse struct {
+	Optionals []OptionalDetails `json:"optionals"`
 }

@@ -1,20 +1,16 @@
 package currency
 
 type (
-	Currency struct {
-		Id        string `json:"Id"`
-		Desc      string `json:"Desc"`
-		StartDate string `json:"FchDesde"`
-		EndDate   string `json:"FchHasta"`
+	CurrencyDetails struct {
+		Id       string `xml:"Id,omitempty" json:"Id,omitempty"`
+		Desc     string `xml:"Desc,omitempty" json:"Desc,omitempty"`
+		FchDesde string `xml:"FchDesde,omitempty" json:"FchDesde,omitempty"`
+		FchHasta string `xml:"FchHasta,omitempty" json:"FchHasta,omitempty"`
 	}
 
-	Cotization struct {
-		CotizationDate  string  `json:"FchCotiz"`
-		CotizationPrice float64 `json:"MonCotiz"`
-		CurrencyId      string  `json:"MonId"`
-		Description     string  `json:"description"`
-		Full            string  `json:"full"`
-		Short           string  `json:"short"`
-		Timestamp       int64   `json:"timestamp"`
+	CurrencyExchangeRate struct {
+		MonId    string  `xml:"MonId,omitempty" json:"MonId,omitempty"`
+		MonCotiz float64 `xml:"MonCotiz,omitempty" json:"MonCotiz,omitempty"`
+		FchCotiz string  `xml:"FchCotiz,omitempty" json:"FchCotiz,omitempty"`
 	}
 )

@@ -14,5 +14,7 @@ const (
 	CreditCard      SellConditionId = 3
 	Check           SellConditionId = 4
 	CheckingAccount SellConditionId = 5
+	Ticket          SellConditionId = 6
+	Transference    SellConditionId = 7
 	Other           SellConditionId = 8
 )

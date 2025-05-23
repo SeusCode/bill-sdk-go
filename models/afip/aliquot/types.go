@@ -3,11 +3,18 @@ package aliquot
 type (
 	AliquotId string
 
-	Aliquot struct {
+	InvoiceAliquot struct {
 		Id         AliquotId `json:"Id"`
 		EndDate    string    `json:"FchHasta"`
 		StartDate  string    `json:"FchDesde"`
 		Percentage string    `json:"Desc"`
+	}
+
+	AliquotDetails struct {
+		Id       string `xml:"Id,omitempty" json:"Id,omitempty"`
+		Desc     string `xml:"Desc,omitempty" json:"Desc,omitempty"`
+		FchDesde string `xml:"FchDesde,omitempty" json:"FchDesde,omitempty"`
+		FchHasta string `xml:"FchHasta,omitempty" json:"FchHasta,omitempty"`
 	}
 )
 

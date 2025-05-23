@@ -3,11 +3,11 @@ package document
 type (
 	DocumentType int32
 
-	Document struct {
-		Id        DocumentType `json:"Id"`
-		Desc      string       `json:"Desc"`
-		StartDate string       `json:"FchDesde"`
-		EndDate   string       `json:"FchHasta"`
+	DocumentDetails struct {
+		Id       DocumentType `xml:"Id,omitempty" json:"Id,omitempty"`
+		Desc     string       `xml:"Desc,omitempty" json:"Desc,omitempty"`
+		FchDesde string       `xml:"FchDesde,omitempty" json:"FchDesde,omitempty"`
+		FchHasta string       `xml:"FchHasta,omitempty" json:"FchHasta,omitempty"`
 	}
 )
 

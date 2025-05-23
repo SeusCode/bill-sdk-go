@@ -14,6 +14,7 @@ func main() {
 	afip, err := afip.NewAfipManager(afip.AfipOptions{
 		ApiKey:     "YOUR_API_KEY",
 		Enviroment: api.PRODUCTION,
+		Language:   api.ENGLISH,
 	})
 
 	if err != nil {
@@ -22,20 +23,15 @@ func main() {
 
 	personIDs := []string{
 		// Add here all the taxId of person you want to get the info
-		"45987987",
 	}
 
 	for _, personID := range personIDs {
-		res, err := afip.Registry.GetPersonInformation(13, personID, document.DNI)
+		res, err := afip.Registry.GetCitizenRecord(13, personID, document.DNI)
 		if err != nil {
-			log.Fatalf("Error getting information for personID %s: %v", personID, err)
+			log.Fatalf("Error getting information for personID %s\n%v", personID, err.Detail)
 		}
 
-		resp, err := json.Marshal(res)
-		if err != nil {
-			log.Fatalf("Error marshaling response for personID %s: %v", personID, err)
-		}
-
-		fmt.Println(string(resp), "\n ")
+		jsonRes, _ := json.Marshal(res)
+		fmt.Println(string(jsonRes))
 	}
 }

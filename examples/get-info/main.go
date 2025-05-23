@@ -9,113 +9,131 @@ import (
 )
 
 func main() {
-	afip, err := afip.NewAfipManager(afip.AfipOptions{
+	afip, initErr := afip.NewAfipManager(afip.AfipOptions{
 		ApiKey:     "YOUR_API_KEY",
 		Enviroment: api.PRODUCTION,
+		Language:   api.SPANISH,
 	})
 
-	if err != nil {
-		panic(err)
+	if initErr != nil {
+		panic(initErr)
 	}
 
 	fmt.Println("\n\n================ aliquots ================")
-	resp, err := afip.EBilling.GetAliquotTypes()
+	resp, err := afip.EBilling.GetAliquots()
 
 	if err != nil {
-		panic(err)
+		parsedErr, _ := json.Marshal(err)
+		panic(string(parsedErr))
 	}
 
-	fmt.Println(resp)
+	jsonResp, _ := json.Marshal(resp)
+	fmt.Println(string(jsonResp))
 	fmt.Println("================ aliquots end ================")
 
 	fmt.Println("\n\n================ concepts ================")
-	conceptResponse, err := afip.EBilling.GetConceptTypes()
+	conceptResponse, err := afip.EBilling.GetConcepts()
 
 	if err != nil {
-		panic(err)
+		parsedErr, _ := json.Marshal(err)
+		panic(string(parsedErr))
 	}
 
-	fmt.Println(*conceptResponse)
+	jsonResp, _ = json.Marshal(*conceptResponse)
+	fmt.Println(string(jsonResp))
 	fmt.Println("================ concepts end ================")
 
 	fmt.Println("\n\n================ documents ================")
-	docResponse, err := afip.EBilling.GetDocumentTypes()
+	docResponse, err := afip.EBilling.GetDocuments()
 
 	if err != nil {
-		panic(err)
+		parsedErr, _ := json.Marshal(err)
+		panic(string(parsedErr))
 	}
 
-	fmt.Println(docResponse)
+	jsonResp, _ = json.Marshal(docResponse)
+	fmt.Println(string(jsonResp))
 	fmt.Println("================ documents end ================")
 
 	fmt.Println("\n\n================ currencies ================")
-	currenciesResponse, err := afip.EBilling.GetCurrenciesTypes()
+	currenciesResponse, err := afip.EBilling.GetCurrencies()
 
 	if err != nil {
-		panic(err)
+		parsedErr, _ := json.Marshal(err)
+		panic(string(parsedErr))
 	}
 
-	fmt.Println(currenciesResponse)
+	jsonResp, _ = json.Marshal(currenciesResponse)
+	fmt.Println(string(jsonResp))
 	fmt.Println("================ currencies end ================")
 
 	fmt.Println("\n\n================ pointofsales ================")
 	posResponse, err := afip.EBilling.GetSalesPoints()
 
 	if err != nil {
-		panic(err)
+		parsedErr, _ := json.Marshal(err)
+		panic(string(parsedErr))
 	}
 
-	fmt.Println(posResponse)
+	jsonResp, _ = json.Marshal(posResponse)
+	fmt.Println(string(jsonResp))
 	fmt.Println("================ pointofsales end ================")
 
-	fmt.Println("\n\n================ taxtypes ================")
-	taxResponse, err := afip.EBilling.GetTaxTypes()
+	fmt.Println("\n\n================ tribute types ================")
+	taxResponse, err := afip.EBilling.GetTributes()
 
 	if err != nil {
-		panic(err)
+		parsedErr, _ := json.Marshal(err)
+		panic(string(parsedErr))
 	}
 
-	fmt.Println(taxResponse)
-	fmt.Println("================ taxtypes end ================")
+	jsonResp, _ = json.Marshal(taxResponse)
+	fmt.Println(string(jsonResp))
+	fmt.Println("================ tribute types end ================")
 
 	fmt.Println("\n\n================ vouchertypes ================")
-	voucherResponse, err := afip.EBilling.GetVoucherTypes()
+	voucherResponse, err := afip.EBilling.GetVouchers()
 
 	if err != nil {
-		panic(err)
+		parsedErr, _ := json.Marshal(err)
+		panic(string(parsedErr))
 	}
 
-	fmt.Println(voucherResponse)
+	jsonResp, _ = json.Marshal(voucherResponse)
+	fmt.Println(string(jsonResp))
 	fmt.Println("================ vouchertypes end ================")
 
 	fmt.Println("\n\n================ payment methods ================")
 	pmResponse, err := afip.EBilling.GetPaymentMethods()
 
 	if err != nil {
-		panic(err)
+		parsedErr, _ := json.Marshal(err)
+		panic(string(parsedErr))
 	}
 
-	js, _ := json.Marshal(pmResponse)
-	fmt.Println(string(js))
+	jsonResp, _ = json.Marshal(pmResponse)
+	fmt.Println(string(jsonResp))
 	fmt.Println("================ payment methods end ================")
 
 	fmt.Println("\n\n================ optionals ================")
-	opResponse, err := afip.EBilling.GetOptionalTypes()
+	opResponse, err := afip.EBilling.GetOptionals()
 	if err != nil {
-		panic(err)
+		parsedErr, _ := json.Marshal(err)
+		panic(string(parsedErr))
 	}
 
-	jsO, _ := json.Marshal(opResponse)
-	fmt.Println(string(jsO))
+	jsonResp, _ = json.Marshal(opResponse)
+	fmt.Println(string(jsonResp))
 	fmt.Println("================ optionals end ================")
 
-	fmt.Println("\n\n================ cotizations ================")
-	cotResponse, err := afip.EBilling.GetCurrencyCotization("DOL")
+	fmt.Println("\n\n================ currency exchange ================")
+	cotResponse, err := afip.EBilling.GetCurrencyExchangeRate("DOL")
 	if err != nil {
-		panic(err)
+		parsedErr, _ := json.Marshal(err)
+		panic(string(parsedErr))
 	}
 
-	jsC, _ := json.Marshal(cotResponse)
-	fmt.Println(string(jsC))
-	fmt.Println("================ cotizations end ================")
+	jsonResp, _ = json.Marshal(cotResponse)
+	fmt.Println(string(jsonResp))
+	fmt.Println("================ currency exchange end ================")
 }

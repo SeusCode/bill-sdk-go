@@ -1,13 +1,11 @@
 package afip
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/seuscode/bill-sdk-go/models/afip/citizen"
 	"github.com/seuscode/bill-sdk-go/models/afip/document"
-	"github.com/seuscode/bill-sdk-go/pkg/endpoints"
 	"github.com/seuscode/bill-sdk-go/pkg/http"
 )
 
@@ -18,7 +16,7 @@ type citizenRegistry interface {
 	 *
 	 * @return array with information of the target
 	 **/
-	GetPersonInformation(registryNumber int, document string, documentType document.DocumentType) (*citizen.GetPersonInformationResponse, error)
+	GetCitizenRecord(registryNumber int, document string, documentType document.DocumentType) (*citizen.GetCitizenRecordResponse, *http.ApiErrorDetails)
 }
 
 type cRegistry struct {
@@ -37,12 +35,8 @@ func newCitizenRegistry(afip *AfipData) citizenRegistry {
 	-=============================-
 */
 
-func (c *cRegistry) GetPersonInformation(registryNumber int, citizenDocument string, documentType document.DocumentType) (*citizen.GetPersonInformationResponse, error) {
-	var resp citizen.GetPersonInformationResponse
-
-	if documentType != document.CUIT && documentType != document.DNI && documentType != document.CUIL {
-		return nil, errors.New("document type not allowed")
-	}
+func (c *cRegistry) GetCitizenRecord(registryNumber int, citizenDocument string, documentType document.DocumentType) (*citizen.GetCitizenRecordResponse, *http.ApiErrorDetails) {
+	var resp citizen.GetCitizenRecordResponse
 
 	endpoint := citizenDocument
 	if registryNumber == 13 {
@@ -53,13 +47,9 @@ func (c *cRegistry) GetPersonInformation(registryNumber int, citizenDocument str
 		}
 	}
 
-	apiData, err := c.afip.HttpClient.Get(fmt.Sprintf("%s/%s", strings.ReplaceAll(endpoints.CITIZEN_DATA, "{padronId}", fmt.Sprintf("%d", registryNumber)), endpoint), &resp)
+	err := c.afip.HttpClient.Get(fmt.Sprintf("%s/%s", strings.ReplaceAll(ENDPOINT_CITIZEN_DATA, "{padronId}", fmt.Sprintf("%d", registryNumber)), endpoint), &resp)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiData.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiData.Status.Code, apiData.Status.Description)
 	}
 
 	return &resp, nil

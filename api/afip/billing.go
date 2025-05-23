@@ -1,49 +1,23 @@
 package afip
 
 import (
-	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/seuscode/bill-sdk-go/models/afip/aliquot"
 	"github.com/seuscode/bill-sdk-go/models/afip/concept"
 	"github.com/seuscode/bill-sdk-go/models/afip/currency"
 	"github.com/seuscode/bill-sdk-go/models/afip/document"
+	"github.com/seuscode/bill-sdk-go/models/afip/invoice"
 	"github.com/seuscode/bill-sdk-go/models/afip/optionals"
 	"github.com/seuscode/bill-sdk-go/models/afip/payment_method"
 	"github.com/seuscode/bill-sdk-go/models/afip/pos"
-	"github.com/seuscode/bill-sdk-go/models/afip/tax"
+	"github.com/seuscode/bill-sdk-go/models/afip/tribute"
 	"github.com/seuscode/bill-sdk-go/models/afip/voucher"
-	"github.com/seuscode/bill-sdk-go/pkg/endpoints"
 	"github.com/seuscode/bill-sdk-go/pkg/http"
 )
 
 type electronicBilling interface {
-	/**
-	 * Create PDF
-	 *
-	 * Send a request to Afip SDK server to create a PDF
-	 *
-	 * @param {object} data Data for PDF creation
-	**/
-	CreatePDF(data voucher.CreateVoucherPDFRequest, folderName, fileName string) (string, error)
-
-	/*
-	 Create a voucher from AFIP
-
-	 Send to AFIP servers request for create a voucher and assign
-	 CAE to them {@see WS Specification item 4.1}
-
-	 @params array data Voucher parameters {@see WS Specification
-	 	item 4.1.3}, some arrays were simplified for easy use {@example
-	 	examples/createVoucher.js Example with all allowed
-	 	 attributes}
-
-	 @return array
-	 	[CAE : CAE assigned to voucher, CAEFchVto : Expiration date
-	 	for CAE (yyyy-mm-dd)] else returns complete response from
-	 	AFIP {@see WS Specification item 4.1.3}
-	**/
-	CreateVoucher(data *voucher.Voucher, response *voucher.CreateVoucherResponse) error
 
 	/**
 	 * Get complete voucher information
@@ -58,7 +32,34 @@ type electronicBilling interface {
 	 * @return array|null returns array with complete voucher information
 	 * 	{@see WS Specification item 4.19} or null if there not exists
 	 **/
-	GetVoucherInfo(voucherNumber, voucherPos int, voucherType voucher.VoucherType) (*voucher.GetVoucherInfoResponse, error)
+	GetIssuedInvoiceData(Pos, invNbr int, invType invoice.InvoiceType) (*invoice.GetInvoiceDataResponse, *http.ApiErrorDetails)
+
+	/*
+	 Create a voucher from AFIP
+
+	 Send to AFIP servers a request to issue an invoice and assign
+	 CAE to them {@see WS Specification item 4.1}
+
+	 @params array data Voucher parameters {@see WS Specification
+	 	item 4.1.3}, some arrays were simplified for easy use {@example
+	 	examples/createVoucher.js Example with all allowed
+	 	 attributes}
+
+	 @return array
+	 	[CAE : CAE assigned to voucher, CAEFchVto : Expiration date
+	 	for CAE (yyyy-mm-dd)] else returns complete response from
+	 	AFIP {@see WS Specification item 4.1.3}
+	**/
+	IssueInvoice(data *invoice.IssueInvoiceRequest) (*invoice.IssueInvoiceResponse, *http.ApiErrorDetails)
+
+	/**
+	 * Create PDF
+	 *
+	 * Send a request to Afip SDK server to create a PDF
+	 *
+	 * @param {object} data Data for PDF creation
+	**/
+	GenerateInvoicePDF(data invoice.GenerateInvoicePDFRequest, folderName, fileName string) (string, error)
 
 	/**
 	 * Asks to AFIP Servers for sales points availables {@see WS
@@ -66,7 +67,7 @@ type electronicBilling interface {
 	 *
 	 * @return array All sales points availables
 	 **/
-	GetSalesPoints() (*pos.GetPointsOfSaleResponse, error)
+	GetSalesPoints() (*pos.GetPointsOfSaleResponse, *http.ApiErrorDetails)
 
 	/**
 	 * Asks to AFIP Servers for voucher types availables {@see WS
@@ -74,7 +75,7 @@ type electronicBilling interface {
 	 *
 	 * @return array All voucher types availables
 	 **/
-	GetVoucherTypes() (*voucher.GetVoucherTypesResponse, error)
+	GetVouchers() (*voucher.GetVouchersResponse, *http.ApiErrorDetails)
 
 	/**
 	 * Asks to AFIP Servers for voucher concepts availables {@see WS
@@ -82,7 +83,7 @@ type electronicBilling interface {
 	 *
 	 * @return array All voucher concepts availables
 	 **/
-	GetConceptTypes() (*concept.GetConceptTypesResponse, error)
+	GetConcepts() (*concept.GetConceptsResponse, *http.ApiErrorDetails)
 
 	/**
 	 * Asks to AFIP Servers for document types availables {@see WS
@@ -90,7 +91,7 @@ type electronicBilling interface {
 	 *
 	 * @return array All document types availables
 	 **/
-	GetDocumentTypes() (*document.GetDocumentTypesResponse, error)
+	GetDocuments() (*document.GetDocumentsResponse, *http.ApiErrorDetails)
 
 	/**
 	 * Asks to AFIP Servers for aliquot availables {@see WS
@@ -98,7 +99,7 @@ type electronicBilling interface {
 	 *
 	 * @return array All aliquot availables
 	 **/
-	GetAliquotTypes() (*aliquot.GetAliquotTypesResponse, error)
+	GetAliquots() (*aliquot.GetAliquotsResponse, *http.ApiErrorDetails)
 
 	/**
 	 * Asks to AFIP Servers for currencies availables {@see WS
@@ -106,7 +107,7 @@ type electronicBilling interface {
 	 *
 	 * @return array All currencies availables
 	 **/
-	GetCurrenciesTypes() (*currency.GetCurrencyTypesResponse, error)
+	GetCurrencies() (*currency.GetCurrenciesResponse, *http.ApiErrorDetails)
 
 	/**
 	 * Asks to AFIP Servers for tax availables {@see WS
@@ -114,28 +115,28 @@ type electronicBilling interface {
 	 *
 	 * @return array All tax availables
 	 **/
-	GetTaxTypes() (*tax.GetTaxTypesResponse, error)
+	GetTributes() (*tribute.GetTributesResponse, *http.ApiErrorDetails)
 
 	/**
 	 * Asks to AFIP Servers for a currency cotization
 	 *
 	 * @return array All currency cotization i
 	 **/
-	GetCurrencyCotization(currencyId string) (*currency.GetCurrencyCotizationResponse, error)
+	GetCurrencyExchangeRate(currencyId string) (*currency.GetCurrencyExchangeRateResponse, *http.ApiErrorDetails)
 
 	/**
 	 * Asks to AFIP Servers for optional types
 	 *
 	 * @return array All optionals availables
 	 **/
-	GetOptionalTypes() (*optionals.GetOptionalTypesResponse, error)
+	GetOptionals() (*optionals.GetOptionalsResponse, *http.ApiErrorDetails)
 
 	/**
 	 * Asks to our API Servers for payment methods
 	 *
 	 * @return array All payment methods availables
 	 **/
-	GetPaymentMethods() (*payment_method.GetPaymentMethodsResponse, error)
+	GetPaymentMethods() (*payment_method.GetPaymentMethodsResponse, *http.ApiErrorDetails)
 }
 
 type eBilling struct {
@@ -154,246 +155,138 @@ func newElectronicBilling(afip *AfipData) electronicBilling {
 	-=============================-
 */
 
-func (e *eBilling) CreateVoucher(data *voucher.Voucher, response *voucher.CreateVoucherResponse) error {
-	r := voucher.CreateVoucherRequest{
-		CbteTipo: data.CbteTipo,
-		Concepto: data.Concepto,
+func (e *eBilling) IssueInvoice(invoiceData *invoice.IssueInvoiceRequest) (*invoice.IssueInvoiceResponse, *http.ApiErrorDetails) {
+	var response invoice.IssueInvoiceResponse
 
-		DocTipo: data.DocTipo,
-		DocNro:  data.DocNro,
-
-		CbteFch: data.CbteFch,
-		Items:   data.Items,
-
-		CbtesAsoc:   data.CbtesAsoc,
-		Tributos:    data.Tributos,
-		Opcionales:  data.Opcionales,
-		Compradores: data.Compradores,
-
-		CompradorIvaExento: data.CompradorIvaExento,
-
-		MonId:    data.MonId,
-		MonCotiz: data.MonCotiz,
-	}
-
-	/*
-		This fields are only required for vouchers
-		wich concepts are not only products, validate
-		that cases
-	*/
-	if r.Concepto != voucher.Productos {
-		if data.FchServDesde == nil {
-			return errors.New("missing required field for this voucher: FchServDesde")
-		}
-
-		if data.FchServHasta == nil {
-			return errors.New("missing required field for this voucher: FchServDesde")
-		}
-
-		if data.FchVtoPago == nil {
-			return errors.New("missing required field for this voucher: FchServDesde")
-		}
-
-		r.FchServDesde = data.FchServDesde
-		r.FchServHasta = data.FchServHasta
-		r.FchVtoPago = data.FchVtoPago
-	}
-
-	/*
-		If document type is final consumer set document
-		number as zero.
-	*/
-	if r.DocTipo == document.CF {
-		r.DocNro = 0
-	}
-
-	f := false
-
-	if r.CompradorIvaExento == nil {
-		r.CompradorIvaExento = &f
-	}
-
-	if (r.MonId != nil && r.MonCotiz == nil) || (r.MonId == nil && r.MonCotiz != nil) {
-		return errors.New("if you send one of this fields (MonId or MonCotiz) you must send the other too")
-	}
-
-	apiStatus, err := e.afip.HttpClient.Post(endpoints.INVOICE, r, response)
+	err := e.afip.HttpClient.Post(ENDPOINT_INVOICE, invoiceData, &response)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if apiStatus.Status.Type != http.SUCCESS {
-		return fmt.Errorf("error (%s): %s", apiStatus.Status.Code, apiStatus.Status.Description)
-	}
-
-	return nil
+	return &response, nil
 }
 
-func (e *eBilling) CreatePDF(data voucher.CreateVoucherPDFRequest, folderName, fileName string) (string, error) {
-	fPath, err := e.afip.HttpClient.PostWithFileOnResponse(endpoints.GET_PDF, data, folderName, fileName)
+func (e *eBilling) GenerateInvoicePDF(data invoice.GenerateInvoicePDFRequest, folderName, fileName string) (string, error) {
+	fPath, err := e.afip.HttpClient.PostWithFileOnResponse(ENDPOINT_INVOICE_PDF, data, folderName, fileName)
 	return fPath, err
 }
 
-func (e *eBilling) GetVoucherInfo(voucherNumber, voucherPos int, voucherType voucher.VoucherType) (*voucher.GetVoucherInfoResponse, error) {
-	var res voucher.GetVoucherInfoResponse
+func (e *eBilling) GetIssuedInvoiceData(pos, invNbr int, invType invoice.InvoiceType) (*invoice.GetInvoiceDataResponse, *http.ApiErrorDetails) {
+	var res invoice.GetInvoiceDataResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(fmt.Sprintf("%s/%d/%d/%d", endpoints.INVOICE, voucherType, voucherPos, voucherNumber), &res)
+	err := e.afip.HttpClient.Get(fmt.Sprintf("%s/%d/%d/%d", ENDPOINT_INVOICE, pos, invType, invNbr), &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (e *eBilling) GetSalesPoints() (*pos.GetPointsOfSaleResponse, error) {
+func (e *eBilling) GetSalesPoints() (*pos.GetPointsOfSaleResponse, *http.ApiErrorDetails) {
 	var res pos.GetPointsOfSaleResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(endpoints.SALES_POINTS, &res)
+	err := e.afip.HttpClient.Get(ENDPOINT_POINTS_OF_SALES, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (e *eBilling) GetVoucherTypes() (*voucher.GetVoucherTypesResponse, error) {
-	var res voucher.GetVoucherTypesResponse
+func (e *eBilling) GetVouchers() (*voucher.GetVouchersResponse, *http.ApiErrorDetails) {
+	var res voucher.GetVouchersResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(endpoints.VOUCHERS, &res)
+	err := e.afip.HttpClient.Get(ENDPOINT_VOUCHERS, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (e *eBilling) GetConceptTypes() (*concept.GetConceptTypesResponse, error) {
-	var res concept.GetConceptTypesResponse
+func (e *eBilling) GetConcepts() (*concept.GetConceptsResponse, *http.ApiErrorDetails) {
+	var res concept.GetConceptsResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(endpoints.CONCEPTS, &res)
+	err := e.afip.HttpClient.Get(ENDPOINT_CONCEPTS, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (e *eBilling) GetDocumentTypes() (*document.GetDocumentTypesResponse, error) {
-	var res document.GetDocumentTypesResponse
+func (e *eBilling) GetDocuments() (*document.GetDocumentsResponse, *http.ApiErrorDetails) {
+	var res document.GetDocumentsResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(endpoints.DOCUMENTS, &res)
+	err := e.afip.HttpClient.Get(ENDPOINT_DOCUMENTS, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (e *eBilling) GetAliquotTypes() (*aliquot.GetAliquotTypesResponse, error) {
-	var res aliquot.GetAliquotTypesResponse
+func (e *eBilling) GetAliquots() (*aliquot.GetAliquotsResponse, *http.ApiErrorDetails) {
+	var res aliquot.GetAliquotsResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(endpoints.ALIQUOTS, &res)
+	err := e.afip.HttpClient.Get(ENDPOINT_ALIQUOTS, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (e *eBilling) GetCurrenciesTypes() (*currency.GetCurrencyTypesResponse, error) {
-	var res currency.GetCurrencyTypesResponse
+func (e *eBilling) GetCurrencies() (*currency.GetCurrenciesResponse, *http.ApiErrorDetails) {
+	var res currency.GetCurrenciesResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(endpoints.CURRENCIES, &res)
+	err := e.afip.HttpClient.Get(ENDPOINT_CURRENCIES, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (e *eBilling) GetTaxTypes() (*tax.GetTaxTypesResponse, error) {
-	var res tax.GetTaxTypesResponse
+func (e *eBilling) GetTributes() (*tribute.GetTributesResponse, *http.ApiErrorDetails) {
+	var res tribute.GetTributesResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(endpoints.TAXES, &res)
+	err := e.afip.HttpClient.Get(ENDPOINT_TRIBUTES, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (e *eBilling) GetPaymentMethods() (*payment_method.GetPaymentMethodsResponse, error) {
+func (e *eBilling) GetPaymentMethods() (*payment_method.GetPaymentMethodsResponse, *http.ApiErrorDetails) {
 	var res payment_method.GetPaymentMethodsResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(endpoints.PAYMENT_METHODS, &res)
+	err := e.afip.HttpClient.Get(ENDPOINT_PAYMENT_METHODS, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (e *eBilling) GetCurrencyCotization(currencyId string) (*currency.GetCurrencyCotizationResponse, error) {
-	var res currency.GetCurrencyCotizationResponse
+func (e *eBilling) GetCurrencyExchangeRate(currencyId string) (*currency.GetCurrencyExchangeRateResponse, *http.ApiErrorDetails) {
+	var res currency.GetCurrencyExchangeRateResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(fmt.Sprintf("%s/%s", endpoints.COTIZATIONS, currencyId), &res)
+	err := e.afip.HttpClient.Get(strings.ReplaceAll(ENDPOINT_CURRENCY_EXCHANGE_RATE, "{currencyId}", currencyId), &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (e *eBilling) GetOptionalTypes() (*optionals.GetOptionalTypesResponse, error) {
-	var res optionals.GetOptionalTypesResponse
+func (e *eBilling) GetOptionals() (*optionals.GetOptionalsResponse, *http.ApiErrorDetails) {
+	var res optionals.GetOptionalsResponse
 
-	apiResponse, err := e.afip.HttpClient.Get(endpoints.OPTIONALS, &res)
+	err := e.afip.HttpClient.Get(ENDPOINT_OPTIONALS, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil

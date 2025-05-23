@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/seuscode/bill-sdk-go/models/api"
 )
 
 type (
@@ -27,9 +29,13 @@ type (
 		Description string        `json:"description"`
 	}
 
-	ApiResponse struct {
-		Data   interface{}      `json:"data"`
-		Status ApiStausResponse `json:"status"`
+	ApiErrorDetails struct {
+		Type     string `json:"type,omitempty"`
+		Title    string `json:"title"`
+		Status   int    `json:"status"`
+		Detail   string `json:"detail"`
+		Instance string `json:"instance,omitempty"`
+		Code     string `json:"code,omitempty"`
 	}
 
 	HttpClient struct {
@@ -57,14 +63,15 @@ func (t *transportWithHeaders) RoundTrip(req *http.Request) (*http.Response, err
 	return t.rt.RoundTrip(req)
 }
 
-func NewHttpClient(authToken *string, baseURL string) *HttpClient {
+func NewHttpClient(authToken *string, baseURL string, lang api.Language) *HttpClient {
 	client := &http.Client{
 		Timeout: 90 * time.Second,
 	}
 
 	// Adding default headers
 	defaultHeaders := map[string]string{
-		"Content-Type": "application/json",
+		"Content-Type":    "application/json",
+		"Accept-Language": string(lang),
 	}
 
 	if authToken != nil {
@@ -84,41 +91,48 @@ func NewHttpClient(authToken *string, baseURL string) *HttpClient {
 	}
 }
 
-func (*HttpClient) HandleErrorResponse(resp *http.Response) error {
-	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+func (*HttpClient) HandleErrorResponse(resp *http.Response) *ApiErrorDetails {
+	if resp.StatusCode == http.StatusOK {
 		return nil
 	}
 
-	return fmt.Errorf("error: status code %d, status: %s", resp.StatusCode, resp.Status)
+	bodyBytes, _ := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	var errDetails ApiErrorDetails
+	err := json.Unmarshal(bodyBytes, &errDetails)
+	if err != nil {
+		panic(fmt.Errorf("error unmarshaling server response into error details: %v", err))
+	}
+
+	return &errDetails
 }
 
-func (c *HttpClient) Get(endpoint string, expectedResponse interface{}) (*ApiResponse, error) {
+func (c *HttpClient) Get(endpoint string, response interface{}) *ApiErrorDetails {
 	c.validateToken()
 
 	req, err := http.NewRequest(GET, fmt.Sprintf("%s%s", c.BaseURL, endpoint), nil)
 	if err != nil {
-		return nil, err
+		panic(fmt.Errorf("error creating request: %v", err))
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return nil, err
+		panic(fmt.Errorf("error doing request: %v", err))
 	}
 
 	if err := c.HandleErrorResponse(resp); err != nil {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("%w: %s", err, string(bodyBytes))
+		return err
 	}
 
-	apiResponse, err := c.bodyParser(resp, expectedResponse)
-	if err != nil {
-		return nil, err
+	if err := c.bodyParser(resp, response); err != nil {
+		panic(fmt.Errorf("error parsing response body: %v", err))
 	}
 
-	return apiResponse, nil
+	return nil
 }
 
-func (c *HttpClient) Post(endpoint string, data interface{}, expectedResponse interface{}) (*ApiResponse, error) {
+func (c *HttpClient) Post(endpoint string, data interface{}, expectedResponse interface{}) *ApiErrorDetails {
 	c.validateToken()
 
 	type apiRequest struct {
@@ -131,30 +145,28 @@ func (c *HttpClient) Post(endpoint string, data interface{}, expectedResponse in
 
 	jsonData, err := json.Marshal(apiReq)
 	if err != nil {
-		return nil, err
+		panic(fmt.Errorf("error marshaling request data: %v", err))
 	}
 
 	req, err := http.NewRequest(POST, fmt.Sprintf("%s%s", c.BaseURL, endpoint), bytes.NewBuffer(jsonData))
 	if err != nil {
-		return nil, err
+		panic(fmt.Errorf("error creating request: %v", err))
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return nil, err
+		panic(fmt.Errorf("error doing request: %v", err))
 	}
 
 	if err := c.HandleErrorResponse(resp); err != nil {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("%w: %s", err, string(bodyBytes))
+		return err
 	}
 
-	apiResponse, err := c.bodyParser(resp, expectedResponse)
-	if err != nil {
-		return nil, err
+	if err := c.bodyParser(resp, expectedResponse); err != nil {
+		panic(fmt.Errorf("error parsing response body: %v", err))
 	}
 
-	return apiResponse, nil
+	return nil
 }
 
 func (c *HttpClient) PostWithFileOnResponse(endpoint string, data interface{}, folderName, fileName string) (string, error) {
@@ -185,45 +197,36 @@ func (c *HttpClient) PostWithFileOnResponse(endpoint string, data interface{}, f
 
 	if err := c.HandleErrorResponse(resp); err != nil {
 		bodyBytes, _ := io.ReadAll(resp.Body)
-		return "", fmt.Errorf("%w: %s", err, string(bodyBytes))
+		return "", fmt.Errorf("%v: %s", err, string(bodyBytes))
 	}
 
 	return c.saveResponseFile(resp, folderName, fileName)
 }
 
-func (c *HttpClient) bodyParser(r *http.Response, expectedResponse interface{}) (*ApiResponse, error) {
+func (c *HttpClient) bodyParser(r *http.Response, expectedResponse interface{}) error {
 	// Read response body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer r.Body.Close()
 
-	var resp ApiResponse
-	err = json.Unmarshal(body, &resp)
-	if err != nil {
-		return nil, err
-	}
-
+	// If not response expected, return nil
 	if expectedResponse == nil {
-		return &resp, nil
+		return nil
 	}
 
+	// Check if expectedResponse is a pointer
 	if reflect.ValueOf(expectedResponse).Kind() != reflect.Ptr {
 		panic(fmt.Errorf("expected %s as expectedResponse, %s received", reflect.Ptr, reflect.ValueOf(expectedResponse).Kind()))
 	}
 
-	jsonParsedData, err := json.Marshal(resp.Data)
+	err = json.Unmarshal(body, expectedResponse)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	err = json.Unmarshal(jsonParsedData, expectedResponse)
-	if err != nil {
-		return &resp, err
-	}
-
-	return &resp, nil
+	return nil
 }
 
 func (c *HttpClient) saveResponseFile(r *http.Response, folderName, fileName string) (string, error) {

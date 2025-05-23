@@ -2,12 +2,10 @@ package afip
 
 import (
 	"errors"
-	"fmt"
+	"strings"
 
 	"github.com/seuscode/bill-sdk-go/config"
-	"github.com/seuscode/bill-sdk-go/models/afip/auth"
 	"github.com/seuscode/bill-sdk-go/models/api"
-	"github.com/seuscode/bill-sdk-go/pkg/endpoints"
 	"github.com/seuscode/bill-sdk-go/pkg/http"
 )
 
@@ -35,17 +33,9 @@ type (
 
 		// Entorno de ejecucion
 		Enviroment api.Enviroment
-	}
-)
 
-type (
-	ServerStatusResponse struct {
-		ServerStatus auth.ServerStatus `json:"server_status"`
-	}
-
-	PingResponse struct {
-		Datetime  string `json:"datetime"`
-		Timestamp int64  `json:"timestamp"`
+		// Language to receive response error messages
+		Language api.Language
 	}
 )
 
@@ -54,43 +44,52 @@ func NewAfipManager(opts AfipOptions) (*AfipData, error) {
 		return nil, errors.New("missing a required parameters")
 	}
 
+	if opts.Language != api.SPANISH && opts.Language != api.ENGLISH {
+		return nil, errors.New("language not allowed")
+	}
+
+	// Set the base URL based on the environment
 	afipManager := &AfipData{
 		apiKey:     opts.ApiKey,
 		enviroment: opts.Enviroment,
 	}
 
-	afipManager.HttpClient = http.NewHttpClient(&afipManager.apiKey, config.API_BASE_URL)
+	// Set the base URL based on the environment
+	baseURL := config.API_BASE_URL
+	switch opts.Enviroment {
+	case api.PRODUCTION:
+		baseURL = strings.ReplaceAll(baseURL, "{env}", "production")
+	case api.TESTING:
+		baseURL = strings.ReplaceAll(baseURL, "{env}", "test")
+	default:
+		return nil, errors.New("invalid environment")
+	}
+
+	// Set the base URL for the API
+	afipManager.HttpClient = http.NewHttpClient(&afipManager.apiKey, baseURL, opts.Language)
 	afipManager.EBilling = newElectronicBilling(afipManager)
 	afipManager.Registry = newCitizenRegistry(afipManager)
 
 	return afipManager, nil
 }
 
-func (g *AfipData) ServerPing() (*PingResponse, error) {
+func (g *AfipData) ServerPing() (*PingResponse, *http.ApiErrorDetails) {
 	var res PingResponse
 
-	apiResponse, err := g.HttpClient.Get(endpoints.PING, &res)
+	err := g.HttpClient.Get(ENDPOINT_PING, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil
 }
 
-func (g *AfipData) AfipServerStatus() (*ServerStatusResponse, error) {
+func (g *AfipData) AfipServerStatus() (*ServerStatusResponse, *http.ApiErrorDetails) {
 	var res ServerStatusResponse
 
-	apiResponse, err := g.HttpClient.Get(endpoints.AFIP_STATUS, &res)
+	err := g.HttpClient.Get(ENDPOINT_AFIP_STATUS, &res)
 	if err != nil {
 		return nil, err
-	}
-
-	if apiResponse.Status.Type != http.SUCCESS {
-		return nil, fmt.Errorf("error (%s): %s", apiResponse.Status.Code, apiResponse.Status.Description)
 	}
 
 	return &res, nil

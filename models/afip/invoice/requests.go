@@ -1,6 +1,6 @@
 package invoice
 
-import "github.com/seuscode/bill-sdk-go/models/afip/document"
+import "github.com/seuscode/bill-sdk-go/v2/models/afip/document"
 
 type (
 	IssueInvoiceRequest struct {

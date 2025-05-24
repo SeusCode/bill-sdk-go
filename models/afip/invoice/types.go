@@ -1,8 +1,8 @@
 package invoice
 
 import (
-	"github.com/seuscode/bill-sdk-go/models/afip/aliquot"
-	"github.com/seuscode/bill-sdk-go/models/afip/payment_method"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/aliquot"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/payment_method"
 )
 
 type (

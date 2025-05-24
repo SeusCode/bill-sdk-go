@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/seuscode/bill-sdk-go/models/api"
+	"github.com/seuscode/bill-sdk-go/v2/models/api"
 )
 
 type (

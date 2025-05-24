@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/seuscode/bill-sdk-go/models/afip/citizen"
-	"github.com/seuscode/bill-sdk-go/models/afip/document"
-	"github.com/seuscode/bill-sdk-go/pkg/http"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/citizen"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/document"
+	"github.com/seuscode/bill-sdk-go/v2/pkg/http"
 )
 
 type citizenRegistry interface {

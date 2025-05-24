@@ -1,4 +1,4 @@
-module github.com/seuscode/bill-sdk-go
+module github.com/seuscode/bill-sdk-go/v2
 
 go 1.22.2
 

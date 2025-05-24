@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/seuscode/bill-sdk-go/models/afip/aliquot"
-	"github.com/seuscode/bill-sdk-go/models/afip/concept"
-	"github.com/seuscode/bill-sdk-go/models/afip/currency"
-	"github.com/seuscode/bill-sdk-go/models/afip/document"
-	"github.com/seuscode/bill-sdk-go/models/afip/invoice"
-	"github.com/seuscode/bill-sdk-go/models/afip/optionals"
-	"github.com/seuscode/bill-sdk-go/models/afip/payment_method"
-	"github.com/seuscode/bill-sdk-go/models/afip/pos"
-	"github.com/seuscode/bill-sdk-go/models/afip/tribute"
-	"github.com/seuscode/bill-sdk-go/models/afip/voucher"
-	"github.com/seuscode/bill-sdk-go/pkg/http"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/aliquot"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/concept"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/currency"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/document"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/invoice"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/optionals"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/payment_method"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/pos"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/tribute"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/voucher"
+	"github.com/seuscode/bill-sdk-go/v2/pkg/http"
 )
 
 type electronicBilling interface {

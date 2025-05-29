@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/seuscode/bill-sdk-go/config"
-	"github.com/seuscode/bill-sdk-go/models/api"
-	"github.com/seuscode/bill-sdk-go/pkg/http"
+	"github.com/seuscode/bill-sdk-go/v2/config"
+	"github.com/seuscode/bill-sdk-go/v2/models/api"
+	"github.com/seuscode/bill-sdk-go/v2/pkg/http"
 )
 
 type (

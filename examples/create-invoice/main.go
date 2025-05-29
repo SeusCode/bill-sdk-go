@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/seuscode/bill-sdk-go/api/afip"
-	"github.com/seuscode/bill-sdk-go/models/afip/aliquot"
-	"github.com/seuscode/bill-sdk-go/models/afip/document"
-	"github.com/seuscode/bill-sdk-go/models/afip/invoice"
-	"github.com/seuscode/bill-sdk-go/models/api"
+	"github.com/seuscode/bill-sdk-go/v2/api/afip"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/aliquot"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/document"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/invoice"
+	"github.com/seuscode/bill-sdk-go/v2/models/api"
 )
 
 func main() {

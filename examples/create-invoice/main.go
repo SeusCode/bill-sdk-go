@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/seuscode/bill-sdk-go/api/afip"
 	"github.com/seuscode/bill-sdk-go/models/afip/aliquot"
@@ -22,27 +23,22 @@ func main() {
 		panic(initErr)
 	}
 
+	vtoPago := time.Now().Add(10 * 24 * time.Hour).Format("20060102")
+
 	invoice, err := afip.EBilling.IssueInvoice(&invoice.IssueInvoiceRequest{
-		CbteTipo: invoice.FACTURA_B,
-		Concepto: invoice.PRODUCTOS,
-		DocTipo:  document.CF,
-		DocNro:   0,
+		CbteTipo:   invoice.FACTURA_C,
+		Concepto:   invoice.SERVICIOS,
+		DocTipo:    document.CF,
+		DocNro:     0,
+		FchVtoPago: &vtoPago,
 		Items: []invoice.InvoiceItem{
 			{
-				Id:       "124",
-				Cantidad: 4.3,
-				Iva:      aliquot.TenDotFivePercent,
-				Precio:   50,
-				Desc:     "Vacio",
-				Subtotal: 215,
-			},
-			{
-				Id:       "99124",
+				Id:       "1",
 				Cantidad: 1,
-				Iva:      aliquot.TenDotFivePercent,
-				Precio:   -200,
-				Desc:     "Descuento en vacio",
-				Subtotal: -200,
+				Iva:      aliquot.ZeroPercent,
+				Precio:   50,
+				Desc:     "Producto de prueba",
+				Subtotal: 50,
 			},
 		},
 	})

@@ -12,6 +12,7 @@ import (
 	"github.com/seuscode/bill-sdk-go/v2/models/afip/optionals"
 	"github.com/seuscode/bill-sdk-go/v2/models/afip/payment_method"
 	"github.com/seuscode/bill-sdk-go/v2/models/afip/pos"
+	"github.com/seuscode/bill-sdk-go/v2/models/afip/receipt"
 	"github.com/seuscode/bill-sdk-go/v2/models/afip/tribute"
 	"github.com/seuscode/bill-sdk-go/v2/models/afip/voucher"
 	"github.com/seuscode/bill-sdk-go/v2/pkg/http"
@@ -60,6 +61,8 @@ type electronicBilling interface {
 	 * @param {object} data Data for PDF creation
 	**/
 	GenerateInvoicePDF(data invoice.GenerateInvoicePDFRequest, folderName, fileName string) (string, error)
+
+	GenerateReceiptPDF(data receipt.GenerateReceiptPDFRequest, folderName, fileName string) (string, error)
 
 	/**
 	 * Asks to AFIP Servers for sales points availables {@see WS
@@ -168,6 +171,11 @@ func (e *eBilling) IssueInvoice(invoiceData *invoice.IssueInvoiceRequest) (*invo
 
 func (e *eBilling) GenerateInvoicePDF(data invoice.GenerateInvoicePDFRequest, folderName, fileName string) (string, error) {
 	fPath, err := e.afip.HttpClient.PostWithFileOnResponse(ENDPOINT_INVOICE_PDF, data, folderName, fileName)
+	return fPath, err
+}
+
+func (e *eBilling) GenerateReceiptPDF(data receipt.GenerateReceiptPDFRequest, folderName, fileName string) (string, error) {
+	fPath, err := e.afip.HttpClient.PostWithFileOnResponse(ENDPOINT_RECEIPT_PDF, data, folderName, fileName)
 	return fPath, err
 }
 

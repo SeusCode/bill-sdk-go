@@ -13,6 +13,7 @@ type (
 	InvoiceMetaData struct {
 		PaymentMethod            payment_method.SellConditionId `json:"metodo_pago,omitempty" uker:"required"`
 		IndirectNacionalTaxTotal float64                        `json:"total_oini,omitempty"` // Total de impuestos indirectos nacionales
+		CurrencyAlias            string                         `json:"currency_alias,omitempty"`
 		ClientFiscalType         InvoiceFiscalType              `json:"client_fiscal_type,omitempty" uker:"required"`
 		ClientPhone              string                         `json:"client_phone,omitempty"`
 		ClientEmail              string                         `json:"client_email,omitempty"`

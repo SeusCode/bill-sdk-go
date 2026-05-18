@@ -28,5 +28,6 @@ type (
 		InvoiceData     IssueInvoiceResponse `json:"data" uker:"required"`
 		InvoiceMetaData InvoiceMetaData      `json:"metadata" uker:"required"`
 		InvoiceProducts []InvoiceItem        `json:"products" uker:"required"`
+		PaperSize       PaperSize            `json:"PaperSize,omitempty"`
 	}
 )

@@ -9,6 +9,7 @@ type (
 	InvoiceType       int
 	InvoiceConcept    int
 	InvoiceFiscalType uint
+	PaperSize         string
 
 	InvoiceMetaData struct {
 		PaymentMethod            payment_method.SellConditionId `json:"metodo_pago,omitempty" uker:"required"`
@@ -83,6 +84,9 @@ type (
 )
 
 const (
+	PAPER_SIZE_A4   PaperSize = "a4"
+	PAPER_SIZE_80MM PaperSize = "80mm"
+
 	// Fiscal Types
 	MONOTRIBUTO                  InvoiceFiscalType = 1
 	NO_CATEGORIZADO              InvoiceFiscalType = 2

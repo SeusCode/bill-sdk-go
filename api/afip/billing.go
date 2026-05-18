@@ -2,6 +2,7 @@ package afip
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/seuscode/bill-sdk-go/v2/models/afip/aliquot"
@@ -54,11 +55,11 @@ type electronicBilling interface {
 	IssueInvoice(data *invoice.IssueInvoiceRequest) (*invoice.IssueInvoiceResponse, *http.ApiErrorDetails)
 
 	/**
-	 * Create PDF
+	 * Create invoice statement
 	 *
-	 * Send a request to Afip SDK server to create a PDF
+	 * Send a request to Afip SDK server to create a PDF or printable HTML.
 	 *
-	 * @param {object} data Data for PDF creation
+	 * @param {object} data Data for statement creation
 	**/
 	GenerateInvoicePDF(data invoice.GenerateInvoicePDFRequest, folderName, fileName string) (string, error)
 
@@ -170,8 +171,22 @@ func (e *eBilling) IssueInvoice(invoiceData *invoice.IssueInvoiceRequest) (*invo
 }
 
 func (e *eBilling) GenerateInvoicePDF(data invoice.GenerateInvoicePDFRequest, folderName, fileName string) (string, error) {
+	fileName = invoiceStatementFileName(data, fileName)
 	fPath, err := e.afip.HttpClient.PostWithFileOnResponse(ENDPOINT_INVOICE_PDF, data, folderName, fileName)
 	return fPath, err
+}
+
+func invoiceStatementFileName(data invoice.GenerateInvoicePDFRequest, fileName string) string {
+	if data.PaperSize != invoice.PAPER_SIZE_80MM {
+		return fileName
+	}
+
+	ext := path.Ext(fileName)
+	if ext != "" && !strings.EqualFold(ext, ".pdf") {
+		return fileName
+	}
+
+	return strings.TrimSuffix(fileName, ext) + ".html"
 }
 
 func (e *eBilling) GenerateReceiptPDF(data receipt.GenerateReceiptPDFRequest, folderName, fileName string) (string, error) {
